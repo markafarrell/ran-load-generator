@@ -1,54 +1,52 @@
-csv2filteredcsv
+#csv2filteredcsv
 
-Input:
+##Input:
 Raw csv output of iperf
 
-Output:
+##Output:
 filtered csv 
 
-flags:
+##flags:
 -f: input file. If omitted use stdin as input
 -o: output file. Optionally output to a file as well as stdout. 
 
-Purpose:
+##Purpose:
 Annotate each row with the test id (timestamp of when the test was started)
 Annotate each row with the test variables (bandwidth used)
 Filter out summary rows
 Filter out rows where iperf was acting at the server.
 Note: output always goes to stdout regardless if -o is used.
- 
 
-csv2sqlite
+#csv2sqlite
 
-Input:
+##Input:
 filtered csv
 
-Output:
+##Output:
 data inserted into common sqlite database
 
-flags:
+##flags:
 -f: input file. If omitted use stdin as input
 -o: output file. Mandatory
 -n: initialize a new sqlite database. If output file exists do nothing.
 -c: clean. Remove all data from sqlite database referenced by -o
 
-Purpose:
+##Purpose:
 insert the filtered csv into an sqlite database
 
+#reportProvider
 
-reportProvider
-
-Input:
+##Input:
 requests from reportRetriever for data
 
-Output:
+##Output:
 csv
 
-flags:
+##flags:
 -f: location of sqlite database file. Mandatory
 -p: port to listen on
 
-Purpose:
+##Purpose:
 Allow reportRetriever to retrieve data from the sqlite database via a TCP port.
 Allow reportRetriever to determine what tests are current (have data after a set timestamp)
 REST Interface Spec:
@@ -61,16 +59,15 @@ return all data for <test_id>
 GET /session/<test_id>/<timestamp>
 return all data for <test_id> after <timestamp>
 
+#reportRetriever
 
-reportRetriever
-
-Input:
+##Input:
 csv data from reportProvider
 
-Output:
+##Output:
 csv (identical to csv2filteredcsv)
 
-flags:
+##flags:
 -h: host to connect to
 -p: port to connect to
 -s: session id. if omitted output all sessions. If timestamp is included but -s omitted only output sessions that have data after -t.
@@ -78,36 +75,33 @@ flags:
 -o: output file
 Note: output always goes to stdout regardless if -o is used.
 
-Purpose:
+##Purpose:
 Get test data over a TCP port.
- 
- 
 
-killSession
+#killSession
 
-Input:
+##Input:
 None
 
-Output:
+##Output:
 None
 
-flags:
+##flags:
 -s: session id.
 
-Purpose:
+##Purpose:
 Kill all the processes associated with a test session.
 NOTE: We need a way to kill the remote processes also. Some kind of watchdog/dead-man's switch.
- 
 
 startSession
 
-Input:
+##Input:
 None
 
-Output:
+##Output:
 session id
 
-flags:
+##flags:
 -b: bandwidth
 -r: remote port. If omitted use random port
 -l: local port. if omitted use random port
@@ -119,5 +113,5 @@ flags:
 -k: ssh key
 -u: ssh username
 
-Purpose:
+##Purpose:
 Start a test session
