@@ -12,7 +12,7 @@ input_file = ''
 output_file = ''
 	
 try:
-	opts, args = getopt.getopt(sys.argv[1:], "hi:o:", ["help", "input=", "output="])
+	opts, args = getopt.getopt(sys.argv[1:], "hf:o:", ["help", "file=", "output="])
 except getopt.GetoptError as err:
 	# print help information and exit:
 	print str(err)  # will print something like "option -a not recognized"
@@ -20,7 +20,7 @@ except getopt.GetoptError as err:
 	sys.exit(2)
 	
 for o, a in opts:
-	if o in ("-i", "--input"):
+	if o in ("-f", "--file"):
 		input_file = a
 	elif o in ("-o", "--output"):
 		output_file = a

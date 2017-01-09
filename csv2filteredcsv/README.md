@@ -7,7 +7,7 @@ Raw csv output of iperf
 filtered csv 
 
 ##flags:
--i: input file. If omitted use stdin as input
+-f: input file. If omitted use stdin as input
 -o: output file. Optionally output to a file as well as stdout. 
 
 ##Purpose:
@@ -18,4 +18,4 @@ Filter out rows where iperf was acting at the server.
 Note: output always goes to stdout regardless if -o is used.
 
 ##Sample:
-python csv2filteredcsv.py -i ..\test_data\s_192_168_1_4_2016-11-03-15_24_41_0296.csv
+python csv2filteredcsv.py -f ..\test_data\s_192_168_1_4_2016-11-03-15_24_41_0296.csv
