@@ -1,20 +1,21 @@
-csv2filteredcsv
+#csv2filteredcsv
 
-Input:
+##Input:
 Raw csv output of iperf
 
-Output:
+##Output:
 filtered csv 
-flags:
+
+##flags:
 -i: input file. If omitted use stdin as input
 -o: output file. Optionally output to a file as well as stdout. 
 
-Purpose:
+##Purpose:
 Annotate each row with the test id (timestamp of when the test was started)
 Annotate each row with the test variables (bandwidth used)
 Filter out summary rows
 Filter out rows where iperf was acting at the server.
 Note: output always goes to stdout regardless if -o is used.
 
-TEST:
+##Sample:
 python csv2filteredcsv.py -i ..\test_data\s_192_168_1_4_2016-11-03-15_24_41_0296.csv
