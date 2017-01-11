@@ -8,7 +8,7 @@ Using Bokeh plotting library for generating plotting web objects
 Use the following code snippet for embedding applications (http://bokeh.pydata.org/en/latest/docs/user_guide/embed.html):
 This requires bokeh to be loaded using the <link>
 
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
