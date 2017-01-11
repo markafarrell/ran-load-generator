@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from bokeh.plotting import figure,output_file,show
+from bokeh.embed import components
 
 #Might be able to refactor a couple of lines if only process 3 is reported so no process filtering is required
 
@@ -15,7 +16,7 @@ source_id3['Timestamp'] = pd.to_datetime(source_id3['Timestamp'],format='%Y-%m-%
 #print(type(source_id3['Timestamp']))  --->    <class 'pandas.core.series.Series'>
 #print(type(source_id3['Throughput (bps)']))   ---->    <class 'pandas.core.series.Series'>
 
-print(source_id3)
+#print(source_id3)
 #ToDo - plot line using bokeh xdata- Timestamp  ydata - BW
 
 output_file('plot.html')
@@ -25,7 +26,8 @@ p.line(source_id3['Timestamp'],source_id3['Throughput (bps)'],color='navy',alpha
 
 show(p)
 
-
-
+script, div = components(p)
+print(script)
+print(div)
 
 #ToDo - Cosmetics - update in while loop or via external process run every second
