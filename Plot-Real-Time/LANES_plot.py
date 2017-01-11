@@ -20,7 +20,7 @@ print(source_id3)
 
 output_file('plot.html')
 
-p = figure(width=800, height=250, x_axis_type = "datetime")
+p = figure(width=1600, height=500, x_axis_type = "datetime")
 p.line(source_id3['Timestamp'],source_id3['Throughput (bps)'],color='navy',alpha=0.5)
 
 show(p)
