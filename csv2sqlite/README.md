@@ -17,3 +17,21 @@ data inserted into common sqlite database
 
 ##Purpose:
 insert the filtered csv into an sqlite database
+
+##Output Columns:
+
+-Session Id
+-Timestamp
+-Source IP
+-Source Port
+-Destination IP
+-Destination Port
+-ID
+-Time Interval
+-Total Bytes
+-Throughput (bps)
+-Jitter (ms)
+-Errors
+-Packets Sent
+-Packet Error Rate (%) 
+-Packets Out Of Order

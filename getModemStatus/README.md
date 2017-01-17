@@ -1,11 +1,22 @@
-README
+#getModemStatus
 
-Test:
+##Input:
+None
 
-D:\Users\d384492\Documents\Projects\ran-load-generator\getModemStatus>python get
-ModemStatus.py -m 192.168.1.1 -p admin
+##Output:
+JSON
 
-Sample Output:
+##flags:
+-m: Modem IP address.
+
+-h: Display help.
+
+-p: Modem admin password
+
+##Purpose:
+Retreive status information from the connected modem.
+
+##Sample Output:
 
 {
     "APN": "telstra.wap",
@@ -26,3 +37,7 @@ Sample Output:
     "cellId": 0,
     "eNodeBId": 730003
 }
+
+##Test:
+
+D:\Users\d384492\Documents\Projects\ran-load-generator\getModemStatus>python getModemStatus.py -m 192.168.1.1 -p admin
