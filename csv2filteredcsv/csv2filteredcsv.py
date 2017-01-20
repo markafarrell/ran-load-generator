@@ -4,21 +4,26 @@ import sys
 import getopt
 import time
 
+def generateHeaders():
+	return "Timestamp,Record Type,Sample Duration,Total Bytes,Throughput,Jitter,Errors,Packets Sent,Packet Error Rate,Packets Out Of Order"
+
 def usage():
 	#TODO: Write help information
 	print "Help!"
 
 input_file = ''
 output_file = ''
-	
+columns=False
+record_type=""
+
 try:
-	opts, args = getopt.getopt(sys.argv[1:], "hf:o:", ["help", "file=", "output="])
+	opts, args = getopt.getopt(sys.argv[1:], "hf:o:cud", ["help", "file=", "output=", "columns","uplink","downlink"])
 except getopt.GetoptError as err:
 	# print help information and exit:
 	print str(err)  # will print something like "option -a not recognized"
 	usage()
 	sys.exit(2)
-	
+
 for o, a in opts:
 	if o in ("-f", "--file"):
 		input_file = a
@@ -27,6 +32,12 @@ for o, a in opts:
 	elif o in ("-h", "--help"):
 		usage()
 		sys.exit()
+	elif o in ("-c", "--columns"):
+		columns=True
+	elif o in ("-u", "--uplink"):
+		record_type = 'u'
+	elif o in ("-d", "--downlink"):
+		record_type = 'd'
 	else:
 		assert False, "unhandled option"
 
@@ -41,9 +52,25 @@ if output_file == '':
 	o = sys.stdout
 else:
 	o = open(output_file, 'w')
-		
-for line in i:
-	res = line.split(',')
+
+if record_type == '':
+	usage()
+	sys.exit()
+	
+if columns:
+	o.write(generateHeaders())
+	o.write('\n')
+	
+while True:
+	try:
+		line = i.readline()
+	except KeyboardInterrupt:
+		sys.exit()
+
+	if not line: 
+		break # EOF
+	
+	res = line.strip().split(',')
 	
 	# Check if the line is valid by seeing if the first column is a valid datetime
 	
@@ -61,9 +88,15 @@ for line in i:
 		# Get length of interval
 		interval = res[6].split('-')
 		interval_sec = float(interval[1])-float(interval[0])
+		res[6] = str(interval_sec)
 		
 		if interval_sec > 1:
 			# Exclude test summary reports
 			pass
 		else:
-			o.write(','.join(res))
+			res = [res[0], record_type] + res[6:]
+			try:
+				o.write(','.join(res))
+				o.write('\n')
+			except:
+				print res
