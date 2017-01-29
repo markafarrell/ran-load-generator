@@ -11,6 +11,11 @@ import signal
 from datetime import datetime
 import sqlite3
 import sessionManagement
+import threading
+
+def waitToFinish():
+	time.sleep(duration+2)
+	sessionManagement.kill_test()
 
 def usage():
 	#TODO: Write help information
@@ -106,9 +111,24 @@ if __name__ == '__main__':
 	
 	local_pid = os.getpid()
 	
+	print "starting iPerf Remote"
+	
 	remote_pid = sessionManagement.runiPerfRemote(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, sql)
 	
+	print "iPerf Remote started"
+		
 	sessionManagement.insertSessionRecord(session, environment_name, environment['hostname'], remote_port, interface, local_port, bandwidth, direction, start_time, duration, local_pid, remote_pid)
+		
+	print "Starting iPerf Local"
+	
+	timerThread = threading.Thread(target=waitToFinish)
+	timerThread.daemon = True
+	timerThread.start()
 	
 	sessionManagement.runiPerfLocal(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, sql, session)
 	
+	print "Test Complete"
+	
+	s = sessionManagement.getSession(session)
+	
+	sessionManagement.killSession(s)	

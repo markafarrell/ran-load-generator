@@ -36,9 +36,8 @@ if __name__ == '__main__':
 
 	try:
 		s = sessionManagement.getSession(session)
-		environment = sessionManagement.config['servers'][s['ENVIRONMENT']]
 	except:
 		usage()
 		sys.exit()
 	
-	sessionManagement.killSession(s, environment)
+	sessionManagement.killSession(s)

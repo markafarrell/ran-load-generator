@@ -35,23 +35,20 @@ def kill_test():
 		print "Killing iperf"
 		iperf_process.terminate()
 	
-	s = getSession(session)
-	
-	killRemoteSession(session)
-	
 def runiPerfRemote(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, sql):
 	if direction == 'b':
 		test_flag = "-d"
 	else:
 		test_flag = ""
 		
-	if(direction == 'd' or direciton == 'b'):
-		iperf_command = "iperf -c $SSH_CLIENT -u -i1 -fm -t" + str(duration) + " -b " + str(bandwidth) + "M" + " -l" + str(datagram_size) + " -p" + str(local_port) + " " + str(test_flag) + " -yC > iperf_logs/" + str(session) + " & echo $!"
+	if(direction == 'd' or direction == 'b'):
+		iperf_command = "iperf-2.0.5 -c $SSH_CLIENT -u -i1 -fm -t" + str(duration) + " -b " + str(bandwidth) + "M" + " -l" + str(datagram_size) + " -p" + str(local_port) + " " + str(test_flag) + " -L" + str(remote_port) + " -yC > iperf_logs/" + str(session) + " & echo $!"
 		ssh_cmd = "ssh\ssh -q -o StrictHostKeyChecking=no -b" + interface + " -o BindAddress=" + interface + " " + environment['username'] + "@" + environment['hostname'] + " -p " + str(environment['ssh_port']) + " -i " + environment['ssh_key'] + " \"" + iperf_command + "\""
-		
 		remote_pid = check_output(ssh_cmd)
 	elif(direction == 'u'):
-		pass
+		iperf_command = "iperf-2.0.5 -s -u -i1 -fm -t" + str(duration) + " -b " + str(bandwidth) + "M" + " -l" + str(datagram_size) + " -p" + str(local_port) + " " + str(test_flag) + " -L" + str(remote_port) + " -yC > iperf_logs/" + str(session) + " & echo $!"
+		ssh_cmd = "ssh\ssh -q -o StrictHostKeyChecking=no -b" + interface + " -o BindAddress=" + interface + " " + environment['username'] + "@" + environment['hostname'] + " -p " + str(environment['ssh_port']) + " -i " + environment['ssh_key'] + " \"" + iperf_command + "\""
+		remote_pid = check_output(ssh_cmd)
 	else:
 		#TODO: handle incorrect direction
 		pass
@@ -77,13 +74,21 @@ def runiPerfLocal(direction, bandwidth, duration, interface, environment, datagr
 	global filteredcsv_process
 	global csv2sqlite_process
 	
-	if(direction == 'd' or direciton == 'b'):
+	if direction == 'b':
+		test_flag = "-d"
+	else:
+		test_flag = ""
+	
+	if(direction == 'd' or direction == 'b'):
 		# bufsize=1 means line buffered
-		iperf_process = Popen(["iperf\iperf", "-s", "-u", "-i", "1", "-l", str(datagram_size), "-p", str(remote_port), "-y", "C"], stdout=PIPE, bufsize=1)
+		iperf_process = Popen(["iperf\iperf", "-s", "-u", "-i", "1", "-l", str(datagram_size), "-p", str(local_port), "-y", "C", "-f", "m"], stdout=PIPE, bufsize=1)
 		filteredcsv_process = Popen(["python", "-u", "../csv2filteredcsv/csv2filteredcsv.py", "-d"], stdin=iperf_process.stdout, stdout=PIPE, bufsize=1)
+		#print ' '.join(["iperf\iperf", "-s", "-u", "-i", "1", "-l", str(datagram_size), "-p", str(local_port), "-y", "C", "-f", "m"])
 		iperf_process.stdout.close()
 	elif(direction == 'u'):
-		pass
+		iperf_process = Popen(["iperf\iperf", "-c", environment['hostname'], "-u", "-i", "1", "-l", str(datagram_size), "-p", str(remote_port),  "-L", str(local_port), "-y", "C", "-t", str(duration), "-f", "m", "-b", str(bandwidth) + "M", "-L", str(local_port), test_flag], stdout=PIPE, bufsize=1)
+		filteredcsv_process = Popen(["python", "-u", "../csv2filteredcsv/csv2filteredcsv.py", "-d"], stdin=iperf_process.stdout, stdout=PIPE, bufsize=1)
+		iperf_process.stdout.close()
 	else:
 		#TODO: handle incorrect direction
 		pass
@@ -111,8 +116,9 @@ def runiPerfLocal(direction, bandwidth, duration, interface, environment, datagr
 			except:
 				kill_test()
 
-def killRemoteSession(session, environment):
+def killRemoteSession(session):
 	try:
+		environment = config['servers'][session['ENVIRONMENT']]
 		kill_cmd = "kill -9 " + str(session['REMOTE_PID'])
 		ssh_cmd = "ssh\ssh -q -o StrictHostKeyChecking=no -b" + session['LOCAL_IP'] + " -o BindAddress=" + session['LOCAL_IP'] + " " + environment['username'] + "@" + environment['hostname'] + " -p " + str(environment['ssh_port']) + " -i " + environment['ssh_key'] + " \"" + kill_cmd + "\""
 		res = check_output(ssh_cmd)
@@ -122,10 +128,14 @@ def killRemoteSession(session, environment):
 	return res
 	
 def killLocalSession(session):
-	return os.kill(session['LOCAL_PID'], signal.SIGTERM)
+	try:
+		os.kill(session['LOCAL_PID'], signal.SIGTERM)
+		return 1
+	except:
+		return 0
 	
-def killSession(session, environment):
-	remote_status = killRemoteSession(session, environment)
+def killSession(session):
+	remote_status = killRemoteSession(session)
 	local_status = killLocalSession(session)
 	
 	completeSession(session)
@@ -152,3 +162,103 @@ def getSession(session):
 		sessions.append(session)
 
 	return sessions[0]
+	
+def getSessions():
+	c = conn.cursor();
+	
+	c.execute('''SELECT SESSION_ID, REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT, COMPLETE FROM 
+					SESSIONS''')
+
+	sessions = []
+	
+	for row in c:
+		session = {}
+		for i in range(0,len(row)):
+			# Construct a dictionary using the column headers and results
+			session[c.description[i][0]] = row[i]
+		sessions.append(session)
+
+	return sessions
+	
+def getSession(session_id):
+	c = conn.cursor();
+	
+	c.execute('''SELECT SESSION_ID, REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT, COMPLETE FROM 
+					SESSIONS WHERE SESSION_ID = ?''', [session_id])
+
+	sessions = []
+	
+	for row in c:
+		session = {}
+		for i in range(0,len(row)):
+			# Construct a dictionary using the column headers and results
+			session[c.description[i][0]] = row[i]
+		sessions.append(session)
+
+	if len(sessions) > 0:
+		return sessions[0]
+	else:
+		return []
+	
+def getSessionsComplete():
+	c = conn.cursor();
+	
+	c.execute('''SELECT SESSION_ID, REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT, COMPLETE FROM 
+					SESSIONS WHERE COMPLETE = 1''')
+
+	sessions = []
+	
+	for row in c:
+		session = {}
+		for i in range(0,len(row)):
+			# Construct a dictionary using the column headers and results
+			session[c.description[i][0]] = row[i]
+		sessions.append(session)
+
+	return sessions
+	
+def getSessionsActive():
+	c = conn.cursor();
+	
+	c.execute('''SELECT SESSION_ID, REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT, COMPLETE FROM 
+					SESSIONS WHERE COMPLETE != 1''')
+
+	sessions = []
+	
+	for row in c:
+		session = {}
+		for i in range(0,len(row)):
+			# Construct a dictionary using the column headers and results
+			session[c.description[i][0]] = row[i]
+		sessions.append(session)
+
+	return sessions
+
+def getSessionsAfter(timestamp):
+
+	
+	c.execute('''SELECT SESSIONS.SESSION_ID, MAX(TIMESTAMP) AS TIMESTAMP , REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT, COMPLETE FROM 
+					SESSION_DATA 
+					INNER JOIN 
+					SESSIONS 
+					ON
+					SESSION_DATA.SESSION_ID = SESSIONS.SESSION_ID
+					WHERE TIMESTAMP > ?
+					GROUP BY SESSIONS.SESSION_ID, REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION GROUP BY SESSION_ID''',[d])
+
+	sessions = []
+
+	for row in c:
+		session = {}
+		for i in range(0,len(row)):
+			# Construct a dictionary using the column headers and results
+			session[c.description[i][0]] = row[i]
+		sessions.append(session)
+	
+def createSession(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port):
+
+	session = random.randint(0,1000000)
+	
+	start_session_process = Popen(["python", "-u", "startSession.py", "-d", direction, "-b", str(bandwidth), "-t", str(duration), "-i", interface, "-e", environment, "-s" ])
+	
+	return session
