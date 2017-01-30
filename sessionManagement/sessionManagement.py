@@ -40,15 +40,22 @@ def runiPerfRemote(direction, bandwidth, duration, interface, environment, datag
 		test_flag = "-d"
 	else:
 		test_flag = ""
-		
+	
+	if os.name == "posix":
+		ssh_path = "ssh"
+	else:
+		ssh_path = "ssh\ssh"
+	
 	if(direction == 'd' or direction == 'b'):
 		iperf_command = "iperf-2.0.5 -c $SSH_CLIENT -u -i1 -fm -t" + str(duration) + " -b " + str(bandwidth) + "M" + " -l" + str(datagram_size) + " -p" + str(local_port) + " " + str(test_flag) + " -L" + str(remote_port) + " -yC > iperf_logs/" + str(session) + " & echo $!"
-		ssh_cmd = "ssh\ssh -q -o StrictHostKeyChecking=no -b" + interface + " -o BindAddress=" + interface + " " + environment['username'] + "@" + environment['hostname'] + " -p " + str(environment['ssh_port']) + " -i " + environment['ssh_key'] + " \"" + iperf_command + "\""
+		ssh_cmd = [ ssh_path, "-q", "-o", "StrictHostKeyChecking=no", "-b", interface, "-o", "BindAddress=" + interface, environment['username'] + "@" + environment['hostname'], "-p", str(environment['ssh_port']), "-i", environment['ssh_key'], iperf_command ]
 		remote_pid = check_output(ssh_cmd)
+		print remote_pid
 	elif(direction == 'u'):
-		iperf_command = "iperf-2.0.5 -s -u -i1 -fm -t" + str(duration) + " -b " + str(bandwidth) + "M" + " -l" + str(datagram_size) + " -p" + str(local_port) + " " + str(test_flag) + " -L" + str(remote_port) + " -yC > iperf_logs/" + str(session) + " & echo $!"
-		ssh_cmd = "ssh\ssh -q -o StrictHostKeyChecking=no -b" + interface + " -o BindAddress=" + interface + " " + environment['username'] + "@" + environment['hostname'] + " -p " + str(environment['ssh_port']) + " -i " + environment['ssh_key'] + " \"" + iperf_command + "\""
+		iperf_command = "iperf-2.0.5 -s -u -i1 -fm -t" + str(duration) + " -b " + str(bandwidth) + "M" + " -l" + str(datagram_size) + " -p" + str(remote_port) + " " + str(test_flag) + " -yC > iperf_logs/" + str(session) + " & echo $!"
+		ssh_cmd = [ ssh_path, "-q", "-o", "StrictHostKeyChecking=no", "-b", interface, "-o", "BindAddress=" + interface, environment['username'] + "@" + environment['hostname'], "-p", str(environment['ssh_port']), "-i", environment['ssh_key'], iperf_command ]
 		remote_pid = check_output(ssh_cmd)
+		print remote_pid
 	else:
 		#TODO: handle incorrect direction
 		pass
@@ -79,14 +86,18 @@ def runiPerfLocal(direction, bandwidth, duration, interface, environment, datagr
 	else:
 		test_flag = ""
 	
+	if os.name == "posix":
+		iperf_path = "iperf"
+	else:
+		iperf_path = "iperf\iperf"
+	
 	if(direction == 'd' or direction == 'b'):
 		# bufsize=1 means line buffered
-		iperf_process = Popen(["iperf\iperf", "-s", "-u", "-i", "1", "-l", str(datagram_size), "-p", str(local_port), "-y", "C", "-f", "m"], stdout=PIPE, bufsize=1)
+		iperf_process = Popen([iperf_path, "-s", "-u", "-i", "1", "-l", str(datagram_size), "-p", str(local_port), "-y", "C", "-f", "m"], stdout=PIPE, bufsize=1)
 		filteredcsv_process = Popen(["python", "-u", "../csv2filteredcsv/csv2filteredcsv.py", "-d"], stdin=iperf_process.stdout, stdout=PIPE, bufsize=1)
-		#print ' '.join(["iperf\iperf", "-s", "-u", "-i", "1", "-l", str(datagram_size), "-p", str(local_port), "-y", "C", "-f", "m"])
 		iperf_process.stdout.close()
 	elif(direction == 'u'):
-		iperf_process = Popen(["iperf\iperf", "-c", environment['hostname'], "-u", "-i", "1", "-l", str(datagram_size), "-p", str(remote_port),  "-L", str(local_port), "-y", "C", "-t", str(duration), "-f", "m", "-b", str(bandwidth) + "M", "-L", str(local_port), test_flag], stdout=PIPE, bufsize=1)
+		iperf_process = Popen([iperf_path, "-c", environment['hostname'], "-u", "-i", "1", "-l", str(datagram_size), "-p", str(remote_port), "-L", str(local_port), "-y", "C", "-t", str(duration), "-f", "m", "-b", str(bandwidth) + "M", "-L", str(local_port), test_flag], stdout=PIPE, bufsize=1)
 		filteredcsv_process = Popen(["python", "-u", "../csv2filteredcsv/csv2filteredcsv.py", "-d"], stdin=iperf_process.stdout, stdout=PIPE, bufsize=1)
 		iperf_process.stdout.close()
 	else:
