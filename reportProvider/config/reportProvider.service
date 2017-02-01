@@ -1,0 +1,16 @@
+[Unit]
+Description=reporProvider uWSGI app
+After=syslog.target
+
+[Service]
+ExecStart=/usr/bin/uwsgi --ini /etc/ran-load-generator/reportProvider.ini
+User=root
+Group=root
+Restart=on-failure
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
