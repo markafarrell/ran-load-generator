@@ -4,8 +4,6 @@ After=syslog.target
 
 [Service]
 ExecStart=/usr/bin/uwsgi --ini /etc/ran-load-generator/reportProvider.ini
-User=root
-Group=root
 Restart=on-failure
 KillSignal=SIGQUIT
 Type=notify

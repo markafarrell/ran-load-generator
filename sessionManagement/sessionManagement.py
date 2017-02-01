@@ -21,7 +21,11 @@ enviornment = ""
 with open('servers.conf') as data_file:
     config = json.load(data_file)
 	
-conn = sqlite3.connect(config['database_path'])
+def get_cursor():
+	conn = sqlite3.connect(config['database_path'])
+	c = conn.cursor()
+
+	return (c, conn)
 
 def kill_test():
 	print "Killing Test"
@@ -49,6 +53,7 @@ def runiPerfRemote(direction, bandwidth, duration, interface, environment, datag
 	if(direction == 'd' or direction == 'b'):
 		iperf_command = "iperf-2.0.5 -c $SSH_CLIENT -u -i1 -fm -t" + str(duration) + " -b " + str(bandwidth) + "M" + " -l" + str(datagram_size) + " -p" + str(local_port) + " " + str(test_flag) + " -L" + str(remote_port) + " -yC > iperf_logs/" + str(session) + " & echo $!"
 		ssh_cmd = [ ssh_path, "-q", "-o", "StrictHostKeyChecking=no", "-b", interface, "-o", "BindAddress=" + interface, environment['username'] + "@" + environment['hostname'], "-p", str(environment['ssh_port']), "-i", environment['ssh_key'], iperf_command ]
+		print ' '.join(ssh_cmd)
 		remote_pid = check_output(ssh_cmd)
 		print remote_pid
 	elif(direction == 'u'):
@@ -63,7 +68,8 @@ def runiPerfRemote(direction, bandwidth, duration, interface, environment, datag
 	return remote_pid
 
 def updateLocalPID(session, pid):
-	c = conn.cursor()
+	(c, conn) = get_cursor()
+
 	c.execute('''UPDATE SESSIONS SET LOCAL_PID = ? WHERE SESSION_ID = ?''', [pid, session])
 	conn.commit()
 	
@@ -152,13 +158,14 @@ def killSession(session):
 	completeSession(session)
 	
 def completeSession(session):
-	c = conn.cursor()
+	(c, conn) = get_cursor()
+
 	c.execute('''UPDATE SESSIONS SET COMPLETE = 1 WHERE SESSION_ID = ?''', [session['SESSION_ID']])
 	conn.commit()
 
 def getSession(session):
-	c = conn.cursor();
-	
+	c = get_cursor()
+
 	c.execute('''SELECT SESSION_ID, REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT FROM 
 					SESSIONS 
 					WHERE SESSION_ID = ?''', [session])
@@ -175,8 +182,8 @@ def getSession(session):
 	return sessions[0]
 	
 def getSessions():
-	c = conn.cursor();
-	
+	(c, conn) = get_cursor()
+
 	c.execute('''SELECT SESSION_ID, REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT, COMPLETE FROM 
 					SESSIONS''')
 
@@ -192,8 +199,8 @@ def getSessions():
 	return sessions
 	
 def getSession(session_id):
-	c = conn.cursor();
-	
+	c = get_cursor()
+
 	c.execute('''SELECT SESSION_ID, REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT, COMPLETE FROM 
 					SESSIONS WHERE SESSION_ID = ?''', [session_id])
 
@@ -212,8 +219,8 @@ def getSession(session_id):
 		return []
 	
 def getSessionsComplete():
-	c = conn.cursor();
-	
+	(c, conn) = get_cursor()
+
 	c.execute('''SELECT SESSION_ID, REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT, COMPLETE FROM 
 					SESSIONS WHERE COMPLETE = 1''')
 
@@ -246,7 +253,7 @@ def getSessionsActive():
 	return sessions
 
 def getSessionsAfter(timestamp):
-
+	(c, conn) = get_cursor()
 	
 	c.execute('''SELECT SESSIONS.SESSION_ID, MAX(TIMESTAMP) AS TIMESTAMP , REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT, COMPLETE FROM 
 					SESSION_DATA 

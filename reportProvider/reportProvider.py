@@ -2,22 +2,54 @@ from flask import Flask, jsonify
 import sqlite3
 import json
 import time
+import os
 
 with open('server.json') as data_file:
     config = json.load(data_file)
 
-conn = sqlite3.connect(config['database_path'])
-c = conn.cursor()
+def get_cursor():
+	conn = sqlite3.connect(config['database_path'])
+	c = conn.cursor()
+	return (c, conn)
 
-app = Flask(__name__)
+application = Flask(__name__)
 
-@app.route('/')
-def hello_world():
-	return 'Hello, World!'
+@application.route('/')
+def spec():
 
-@app.route('/sessions', methods=['GET'])
+	spec = """<html><body><pre>Interface Specification:
+GET /sessions
+
+return list of all sessions in database. i.e. all unique test ids
+
+GET /sessions/[timestamp]
+
+return list of all sessions in database with records after [timestamp]
+
+GET /session/[session_id]
+
+return all data for [session_id]
+
+GET /session/all
+
+return all data for all sessions
+
+GET /session/[session_id]/[timestamp]
+
+return all data for [session_id] after [timestamp]
+
+GET /session/all/[timestamp]
+
+return all data for all sessions after [timestamp]
+</pre></body></html>"""
+	return spec 
+
+@application.route('/sessions', methods=['GET'])
 
 def get_sessions():
+
+	(c, conn) = get_cursor()	
+
 	c.execute('''SELECT SESSIONS.SESSION_ID, MAX(TIMESTAMP) AS TIMESTAMP , REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION FROM 
 					SESSION_DATA 
 					INNER JOIN 
@@ -37,12 +69,14 @@ def get_sessions():
 
 	return jsonify(sessions)
 
-@app.route('/sessions/<timestamp>', methods=['GET'])
+@application.route('/sessions/<timestamp>', methods=['GET'])
 
 def get_sessions_after(timestamp):
 
 	d = time.strptime(timestamp,'%Y%m%d%H%M%S')
 	d = time.strftime('%Y-%m-%d %H:%M:%S', d)
+
+	(c, conn) = get_cursor()	
 	
 	c.execute('''SELECT SESSIONS.SESSION_ID, MAX(TIMESTAMP) AS TIMESTAMP , REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION FROM 
 					SESSION_DATA 
@@ -64,10 +98,12 @@ def get_sessions_after(timestamp):
 		
 	return jsonify(sessions)
 
-@app.route('/session/<session_id>', methods=['GET'])
+@application.route('/session/<session_id>', methods=['GET'])
 
 def get_session_data(session_id):
 	
+	(c, conn) = get_cursor()	
+
 	c.execute('''SELECT * FROM SESSION_DATA WHERE SESSION_ID = ? ORDER BY TIMESTAMP ASC''', [session_id])
 
 	#r = {}
@@ -92,10 +128,12 @@ def get_session_data(session_id):
 	return r
 	
 	
-@app.route('/session/all', methods=['GET'])
+@application.route('/session/all', methods=['GET'])
 
 def get_all_session_data():
 	
+	c = get_cursor()	
+
 	c.execute('''SELECT * FROM SESSION_DATA ORDER BY TIMESTAMP ASC''')
 
 	#r = {}
@@ -119,9 +157,11 @@ def get_all_session_data():
 	
 	return r
 
-@app.route('/session/<session_id>/<timestamp>', methods=['GET'])
+@application.route('/session/<session_id>/<timestamp>', methods=['GET'])
 
 def get_session_data_after(session_id,timestamp):
+	(c, conn) = get_cursor()	
+
 	d = time.strptime(timestamp,'%Y%m%d%H%M%S')
 	d = time.strftime('%Y-%m-%d %H:%M:%S', d)
 	
@@ -148,9 +188,11 @@ def get_session_data_after(session_id,timestamp):
 	
 	return r
 	
-@app.route('/session/all/<timestamp>', methods=['GET'])
+@application.route('/session/all/<timestamp>', methods=['GET'])
 
 def get_all_session_data_after(timestamp):
+	(c, conn) = get_cursor()	
+
 	d = time.strptime(timestamp,'%Y%m%d%H%M%S')
 	d = time.strftime('%Y-%m-%d %H:%M:%S', d)
 	
@@ -172,4 +214,4 @@ def get_all_session_data_after(timestamp):
 	return r
 	
 if __name__ == "__main__":
-    app.run()
+    application.run()

@@ -6,18 +6,48 @@ import time
 with open('server.json') as data_file:
     config = json.load(data_file)
 
-conn = sqlite3.connect(config['database_path'])
-c = conn.cursor()
+def get_cursor():
+	conn = sqlite3.connect(config['database_path'])
+	c = conn.cursor()
 
-app = Flask(__name__)
+	return (c, conn)
 
-@app.route('/')
-def hello_world():
-	return 'Hello, World!'
+application = Flask(__name__)
 
-@app.route('/devices', methods=['GET'])
+@application.route('/')
+def spec():
+
+	spec = """<html><body><pre>Interface Specification:
+
+GET /devices
+
+return list of all devices in database.
+
+GET /devices/[timestamp]
+
+return list of all sessions in database with records after [timestamp]
+
+GET /device/[device_name]
+
+return all data for [device_name]
+
+GET /session/[device_name]/latest
+
+return latest data for [device_name]
+
+GET /session/[device_name]/[timestamp]
+
+return all data for [device_name] after [timestamp]
+</pre></body></html>
+"""
+
+	return spec 
+
+@application.route('/devices', methods=['GET'])
 
 def get_devices():
+	(c, conn) = get_cursor()
+
 	c.execute('''SELECT DISTINCT DEVICE_IP FROM DEVICE_STATUS''')
 
 	devices = []
@@ -27,9 +57,10 @@ def get_devices():
 		
 	return jsonify(devices)
 
-@app.route('/devices/<timestamp>', methods=['GET'])
+@application.route('/devices/<timestamp>', methods=['GET'])
 
 def get_devices_after(timestamp):
+	(c, conn) = get_cursor()
 
 	d = time.strptime(timestamp,'%Y%m%d%H%M%S')
 	d = time.strftime('%Y-%m-%d %H:%M:%S', d)
@@ -43,9 +74,11 @@ def get_devices_after(timestamp):
 		
 	return jsonify(devices)
 
-@app.route('/device/<device_name>', methods=['GET'])
+@application.route('/device/<device_name>', methods=['GET'])
 
 def get_status(device_name):
+	(c, conn) = get_cursor()
+
 	c.execute('''SELECT * FROM DEVICE_STATUS WHERE DEVICE_IP = ? ORDER BY TIMESTAMP DESC''', [device_name])
 
 	r = []
@@ -59,9 +92,11 @@ def get_status(device_name):
 
 	return jsonify(r)
 
-@app.route('/device/<device_name>/latest', methods=['GET'])
+@application.route('/device/<device_name>/latest', methods=['GET'])
 
 def get_status_latest(device_name):
+	(c, conn) = get_cursor()
+
 	c.execute('''SELECT * FROM DEVICE_STATUS WHERE DEVICE_IP = ? ORDER BY TIMESTAMP DESC LIMIT 1''', [device_name])
 
 	r = {}
@@ -73,9 +108,11 @@ def get_status_latest(device_name):
 
 	return jsonify(r)
 
-@app.route('/device/<device_name>/<int:timestamp>', methods=['GET'])
+@application.route('/device/<device_name>/<int:timestamp>', methods=['GET'])
 
 def get_status_after(device_name, timestamp):
+	(c, conn) = get_cursor()
+
 	d = time.strptime(timestamp,'%Y%m%d%H%M%S')
 	d = time.strftime('%Y-%m-%d %H:%M:%S', d)
 
@@ -93,4 +130,4 @@ def get_status_after(device_name, timestamp):
 	return jsonify(r)
 	
 if __name__ == "__main__":
-    app.run()
+    application.run()

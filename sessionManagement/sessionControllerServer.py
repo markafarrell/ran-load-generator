@@ -4,34 +4,72 @@ import json
 import time
 import sessionManagement
 
-app = Flask(__name__)
+application = Flask(__name__)
 
-@app.route('/')
-def hello_world():
-	return 'Hello, World!'
+@application.route('/')
+def spec():
+	spec = """<html><body><pre>Interface Specification:
+GET /sessions
 
-@app.route('/sessions', methods=['GET'])
+return list of all sessions in database. i.e. all unique test ids
+
+GET /sessions/complete
+
+return list of all sessions in database marked complete
+
+GET /sessions/active
+
+return list of all sessions in database that have started by not completed
+
+GET /sessions/[timestamp]
+
+return list of all sessions in database that have results after [timestamp]
+
+GET /sessions/[session_id]
+
+return details of [session_id]
+
+POST /session/
+
+FORM fields:
+
+Required:
+-direction : [u/d/b]
+-bandwidth : in Mbps
+-duration : in seconds
+-interface : interface to use for test
+-enviornment : environment to test against
+
+Optional:
+-datagram-size : in bytes
+-remote_port : remote port to be used in test
+-local_port : local port to be used in test
+</pre></body></html>"""
+
+	return spec
+
+@application.route('/sessions', methods=['GET'])
 
 def get_sessions():
 	sessions = sessionManagement.getSessions()
 	
 	return jsonify(sessions)
 
-@app.route('/sessions/complete', methods=['GET'])
+@application.route('/sessions/complete', methods=['GET'])
 	
 def get_sessions_complete():
 	sessions = sessionManagement.getSessionsComplete()
 	
 	return jsonify(sessions)
 
-@app.route('/sessions/active', methods=['GET'])
+@application.route('/sessions/active', methods=['GET'])
 	
 def get_sessions_active():
 	sessions = sessionManagement.getSessionsActive()
 	
 	return jsonify(sessions)
 	
-@app.route('/sessions/<timestamp>', methods=['GET'])
+@application.route('/sessions/<timestamp>', methods=['GET'])
 
 def get_sessions_after(timestamp):
 
@@ -40,12 +78,12 @@ def get_sessions_after(timestamp):
 		
 	return jsonify(sessionManagement.getSessionsAfter(d))
 
-@app.route('/session/<session_id>', methods=['GET'])
+@application.route('/session/<session_id>', methods=['GET'])
 
 def get_session(session_id):
 	return jsonify(sessionManagement.getSession(session_id))
 	
-@app.route('/session/', methods=['POST'])
+@application.route('/session/', methods=['POST'])
 
 def create_session():
 
@@ -76,7 +114,7 @@ def create_session():
 
 	return str(s)
 
-@app.route('/session/<session_id>', methods=['DELETE'])
+@application.route('/session/<session_id>', methods=['DELETE'])
 	
 def terminate_session(session_id):
 	s = sessionManagement.getSession(session_id)
@@ -85,4 +123,4 @@ def terminate_session(session_id):
 	return jsonify(s)
 	
 if __name__ == "__main__":
-    app.run()
+    application.run()
