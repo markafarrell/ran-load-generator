@@ -20,18 +20,18 @@ GET /devices
 
 return list of all devices in database.
 
-GET /devices/<timestamp>
+GET /devices/[timestamp]
 
-return list of all sessions in database with records after <timestamp>
+return list of all sessions in database with records after [timestamp]
 
-GET /device/<device_name>
+GET /device/[device_name]
 
-return all data for <device_name>
+return all data for [device_name]
 
-GET /session/<device_name>/latest
+GET /session/[device_name]/latest
 
-return latest data for <device_name>
+return latest data for [device_name]
 
-GET /session/<device_name>/<timestamp>
+GET /session/[device_name]/[timestamp]
 
-return all data for <device_name> after <timestamp>
+return all data for [device_name] after [timestamp]

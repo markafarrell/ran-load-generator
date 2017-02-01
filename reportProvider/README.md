@@ -22,14 +22,22 @@ GET /sessions
 
 return list of all sessions in database. i.e. all unique test ids
 
-GET /sessions/<timestamp>
+GET /sessions/[timestamp]
 
-return list of all sessions in database with records after <timestamp>
+return list of all sessions in database with records after [timestamp]
 
-GET /session/<test_id>
+GET /session/[session_id]
 
-return all data for <test_id>
+return all data for [session_id]
 
-GET /session/<test_id>/<timestamp>
+GET /session/all
 
-return all data for <test_id> after <timestamp>
+return all data for all sessions
+
+GET /session/[session_id]/[timestamp]
+
+return all data for [session_id] after [timestamp]
+
+GET /session/all/[timestamp]
+
+return all data for all sessions after [timestamp]
