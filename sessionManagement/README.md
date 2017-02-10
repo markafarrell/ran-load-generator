@@ -32,27 +32,27 @@ Start a test session
 
 Installing:
 
-# Install Dependancies
+###Install Dependancies
 
 sudo apt-get install build-essential python-dev python-pip uswgi uwsgi-plugin-python nginx
 
 sudo pip install flask
 
-# Create a directory for the UNIX sockets
+###Create a directory for the UNIX sockets
 sudo mkdir /var/run/ran-load-generator
 sudo chown www-data:www-data /var/run/ran-load-generator
 
-# Create a directory for the logs
+###Create a directory for the logs
 sudo mkdir /var/log/ran-load-generator
 sudo chown www-data:www-data /var/log/ran-load-generator
 
-# Create a directory for the configs
+###Create a directory for the configs
 sudo mkdir /etc/ran-load-generator
 
-# Copy config files to /etc/ran-load-generator
+###Copy config files to /etc/ran-load-generator
 sudo cp config/sessionControllerServer.ini /etc/ran-load-generator/
 
-# Copy init file to /etc/systemd/system
+###Copy init file to /etc/systemd/system
 sudo cp config/sessionControllerServer.service /etc/systemd/system/
 
 sudo systemctl start sessionControllerServer
@@ -93,13 +93,18 @@ FORM fields:
 
 Required:
 -direction : [u/d/b]
+
 -bandwidth : in Mbps
+
 -duration : in seconds
+
 -interface : interface to use for test
+
 -enviornment : environment to test against
 
 Optional:
 -datagram-size : in bytes
--remote_port : remote port to be used in test
--local_port : local port to be used in test
 
+-remote_port : remote port to be used in test
+
+-local_port : local port to be used in test
