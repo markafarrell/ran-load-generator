@@ -30,7 +30,7 @@ session id
 ##Purpose:
 Start a test session
 
-Installing:
+#Installing Service:
 
 ###Install Dependancies
 
@@ -92,6 +92,7 @@ POST /session/
 FORM fields:
 
 Required:
+
 -direction : [u/d/b]
 
 -bandwidth : in Mbps
@@ -103,6 +104,7 @@ Required:
 -enviornment : environment to test against
 
 Optional:
+
 -datagram-size : in bytes
 
 -remote_port : remote port to be used in test
