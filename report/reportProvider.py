@@ -4,7 +4,7 @@ import json
 import time
 import os
 
-with open('server.json') as data_file:
+with open('config/server.json') as data_file:
     config = json.load(data_file)
 
 def get_cursor():

@@ -2,8 +2,9 @@ from flask import Flask, jsonify
 import sqlite3
 import json
 import time
+from getModemStatus import getStatus
 
-with open('server.json') as data_file:
+with open('config/server.json') as data_file:
     config = json.load(data_file)
 
 def get_cursor():
@@ -105,6 +106,13 @@ def get_status_latest(device_name):
 		for i in range(0,len(row)):
 			# Construct a dictionary using the column headers and results
 			r[c.description[i][0]] = row[i]
+
+	return jsonify(r)
+
+@application.route('/device/<device_name>/current', methods=['GET'])
+
+def get_status_current(device_name):
+	r = getStatus(device_name, 'admin')
 
 	return jsonify(r)
 

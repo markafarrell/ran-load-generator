@@ -18,7 +18,7 @@ csv2sqlite_process=None
 session = -1
 enviornment = ""
 
-with open('servers.conf') as data_file:
+with open('config/servers.conf') as data_file:
     config = json.load(data_file)
 	
 def get_cursor():
