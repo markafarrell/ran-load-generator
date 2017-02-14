@@ -16,8 +16,51 @@ from datetime import datetime
 MME_codes = { 16 : 'PARU', 144 : 'NPE9', 8 : 'PARY', 48 : 'NHE8', 152 : 'NHE7', 112 : 'VWE8', 40 : 'VWE9', 168 : 'VXE7', 160 : 'NNE7', 24 : 'VWE7'}
 
 def usage():
-	#TODO: Write help information
-	print "Help!"
+	help = '''#getModemStatus
+
+##Input:
+None
+
+##Output:
+JSON
+
+##flags:
+-m: Modem IP address. (default 192.168.1.1)
+
+-h: Display help.
+
+-p: Modem admin password (default admin)
+
+##Purpose:
+Retreive status information from the connected modem.
+
+##Sample Output:
+
+{
+    "APN": "telstra.wap",
+    "Band": "LTE B7",
+    "Channel": 2950,
+    "IMEI": "351588070626600",
+    "IMSI": "505013438812645",
+    "MME": "VXE7",
+    "MME Id": 168,
+    "PCI": 25,
+    "PLMN": "505-01",
+    "RAT": "LTE",
+    "RSRP": -76,
+    "SINR": 30,
+    "SVN": "01",
+    "TAC": 12290,
+    "WWAN_IP": "10.142.228.25",
+    "cellId": 0,
+    "eNodeBId": 730003
+}
+
+##Test:
+
+python getModemStatus.py -m 192.168.1.1 -p admin'''
+
+	print help 
 
 def generateHeaders():
 	return "Timestamp,Device IP,APN,Band,Channel,IMEI,IMSI,MME,MME Id,PCI,PLMN,RAT,RSRP,SINR,SVN,TAC,WWAN_IP,cellId,eNodeBId"

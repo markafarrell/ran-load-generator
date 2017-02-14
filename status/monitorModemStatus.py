@@ -11,6 +11,47 @@ output_format = ""
 sql = False
 output_file = ""
 
+def usage():
+	help = '''#monitorModemStatus
+
+##Input:
+None
+
+##Output:
+modem status
+
+##flags:
+-m: Modem IP address. (default 192.168.1.1)
+
+-h: Display help.
+
+-p: Modem admin password (default admin)
+
+-o: Output file (if not specified output to stdout)
+
+-i: Interval between getting modem status
+
+-c: Output as csv
+
+-j: Output as json
+
+-s: Output to sqlite database
+
+##Purpose:
+Periodicly retreive status information from the connected modem.
+
+##Sample Output:
+
+Timestamp,Device IP,APN,Band,Channel,IMEI,IMSI,MME,MME Id,PCI,PLMN,RAT,RSRP,SINR,SVN,TAC,WWAN_IP,cellId,eNodeBId
+2017-02-15 10:18:19,192.168.1.1,telstra.LANES,LTE B3,1275,351588071475585,505720004200015,NHE7,152,263,505-01,LTE,-85,12,01,12290,10.96.197.37,3,530183
+2017-02-15 10:18:24,192.168.1.1,telstra.LANES,LTE B3,1275,351588071475585,505720004200015,NHE7,152,263,505-01,LTE,-85,13,01,12290,10.96.197.37,3,530183
+2017-02-15 10:18:29,192.168.1.1,telstra.LANES,LTE B3,1275,351588071475585,505720004200015,NHE7,152,263,505-01,LTE,-85,13,01,12290,10.96.197.37,3,530183
+
+##Test:
+
+python monitorModemStatus.py -i 5 -c'''
+	print help
+
 def insertModemStatus(output_file,d):
 	
 	conn = sqlite3.connect(output_file)

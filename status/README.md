@@ -7,11 +7,11 @@ None
 JSON
 
 ##flags:
--m: Modem IP address.
+-m: Modem IP address. (default 192.168.1.1)
 
 -h: Display help.
 
--p: Modem admin password
+-p: Modem admin password (default admin)
 
 ##Purpose:
 Retreive status information from the connected modem.
@@ -40,21 +40,62 @@ Retreive status information from the connected modem.
 
 ##Test:
 
-D:\Users\d384492\Documents\Projects\ran-load-generator\getModemStatus>python getModemStatus.py -m 192.168.1.1 -p admin#statusProvider
+python getModemStatus.py -m 192.168.1.1 -p admin
+
+#monitorModemStatus
 
 ##Input:
-requests from statusRetriever for data
+None
 
 ##Output:
-csv
+modem status
 
 ##flags:
--f: location of sqlite database file. Mandatory
+-m: Modem IP address. (default 192.168.1.1)
+
+-h: Display help.
+
+-p: Modem admin password (default admin)
+
+-o: Output file (if not specified output to stdout)
+
+-i: Interval between getting modem status
+
+-c: Output as csv
+
+-j: Output as json
+
+-s: Output to sqlite database
+
+##Purpose:
+Periodicly retreive status information from the connected modem.
+
+##Sample Output:
+
+Timestamp,Device IP,APN,Band,Channel,IMEI,IMSI,MME,MME Id,PCI,PLMN,RAT,RSRP,SINR,SVN,TAC,WWAN_IP,cellId,eNodeBId
+2017-02-15 10:18:19,192.168.1.1,telstra.LANES,LTE B3,1275,351588071475585,505720004200015,NHE7,152,263,505-01,LTE,-85,12,01,12290,10.96.197.37,3,530183
+2017-02-15 10:18:24,192.168.1.1,telstra.LANES,LTE B3,1275,351588071475585,505720004200015,NHE7,152,263,505-01,LTE,-85,13,01,12290,10.96.197.37,3,530183
+2017-02-15 10:18:29,192.168.1.1,telstra.LANES,LTE B3,1275,351588071475585,505720004200015,NHE7,152,263,505-01,LTE,-85,13,01,12290,10.96.197.37,3,530183
+
+##Test:
+
+python monitorModemStatus.py -i 5 -c
+
+#statusProvider
+
+##Input:
+REST requests from statusRetriever for data
+
+##Output:
+csv or json as per REST Interface Spec
+
+##flags:
+-o: location of sqlite database file. Mandatory
 
 -p: port to listen on
 
 ##Purpose:
-Allow statusRetriever to retrieve data from the sqlite database via a TCP port.
+Allow clients to retrieve data from the sqlite database via HTTP.
 
 ##REST Interface Spec:
 

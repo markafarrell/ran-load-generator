@@ -4,10 +4,14 @@
 None
 
 ##Output:
-session id
+iperf results
 
 ##flags:
--b: bandwidth
+-h: print help
+
+-d: direction (u-Uplink, d-Downlink or b-Bidirectional)
+
+-b: bandwidth (In Mbps)
 
 -r: remote port. If omitted use random port
 
@@ -15,20 +19,38 @@ session id
 
 -t: duration in seconds
 
--o: database file. If omitted only output to csv
+-o: output type. (sql - insert into sqlite database specified in config/servers.conf)
 
 -i: local interface to use
 
--s: server IP address
+-e: test enviornment to use (from config/servers.conf)
 
--p: server ssh port
-
--k: ssh key
-
--u: ssh username
+-s: session id to tag results with
 
 ##Purpose:
 Start a test session
+
+##Test:
+sudo -u www-data python startSession.py -d d -b 10 -t 10 -i 192.168.1.4 -e windsor_production
+
+##Sample Output:
+
+starting iPerf Remote
+iPerf Remote started
+Starting iPerf Local
+2017-02-15 10:29:34,d,1.0,1251600,10012800,0.273,87,981,8.869,0
+2017-02-15 10:29:35,d,1.0,1250200,10001600,0.307,0,893,0.000,0
+2017-02-15 10:29:36,d,1.0,1250200,10001600,0.679,0,893,0.000,0
+2017-02-15 10:29:37,d,1.0,1250200,10001600,0.141,0,893,0.000,0
+2017-02-15 10:29:38,d,1.0,1243200,9945600,0.287,0,888,0.000,0
+2017-02-15 10:29:39,d,1.0,1255800,10046400,0.367,0,897,0.000,0
+2017-02-15 10:29:40,d,1.0,1250200,10001600,1.006,0,893,0.000,0
+2017-02-15 10:29:41,d,1.0,1248800,9990400,0.355,0,892,0.000,0
+2017-02-15 10:29:42,d,1.0,1244600,9956800,0.399,0,889,0.000,0
+Killing Test
+Killing csv2filteredcsv
+Killing iperf
+ Test Complete
 
 #Installing Service:
 

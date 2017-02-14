@@ -155,7 +155,7 @@ def get_all_session_data():
 		#join results with comma seperation. Map used to cast each column to string
 		r += ','.join(map(str,row)) + '\n'
 	
-	return r
+	return Response(r, mimetype='text/plain')
 
 @application.route('/session/<session_id>/<timestamp>', methods=['GET'])
 
@@ -186,7 +186,7 @@ def get_session_data_after(session_id,timestamp):
 		#join results with comma seperation. Map used to cast each column to string
 		r += ','.join(map(str,row)) + '\n'
 	
-	return r
+	return Response(r, mimetype='text/plain')
 	
 @application.route('/session/all/<timestamp>', methods=['GET'])
 
@@ -211,7 +211,7 @@ def get_all_session_data_after(timestamp):
 		#join results with comma seperation. Map used to cast each column to string
 		r += ','.join(map(str,row)) + '\n'
 	
-	return r
+	return Response(r, mimetype='text/plain')
 	
 if __name__ == "__main__":
     application.run()

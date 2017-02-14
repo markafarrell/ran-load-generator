@@ -166,7 +166,7 @@ def completeSession(session):
 	conn.commit()
 
 def getSession(session):
-	c = get_cursor()
+	(c, conn) = get_cursor()
 
 	c.execute('''SELECT SESSION_ID, REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT FROM 
 					SESSIONS 
@@ -238,10 +238,10 @@ def getSessionsComplete():
 	return sessions
 	
 def getSessionsActive():
-	c = conn.cursor();
+	(c, conn) = get_cursor()
 	
 	c.execute('''SELECT SESSION_ID, REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT, COMPLETE FROM 
-					SESSIONS WHERE COMPLETE != 1''')
+					SESSIONS WHERE COMPLETE != 1 AND julianday('now','localtime')<julianday(start_time)+duration/(24.0*60*60)''')
 
 	sessions = []
 	
