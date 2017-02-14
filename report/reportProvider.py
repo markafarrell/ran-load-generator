@@ -1,8 +1,9 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, Response
 import sqlite3
 import json
 import time
 import os
+
 
 with open('config/server.json') as data_file:
     config = json.load(data_file)
@@ -125,8 +126,7 @@ def get_session_data(session_id):
 		#join results with comma seperation. Map used to cast each column to string
 		r += ','.join(map(str,row)) + '\n'
 	
-	return r
-	
+	return Response(r, mimetype='text/plain')
 	
 @application.route('/session/all', methods=['GET'])
 

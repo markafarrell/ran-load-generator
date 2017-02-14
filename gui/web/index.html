@@ -1,0 +1,43 @@
+<html>
+	<head>
+		<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
+		<script type="text/javascript" src="js/ran-load-generator.js"></script>
+	</head>
+	<body>
+	<h1>Load Generator!</h1>
+	<form name="new_session" id="new_session">
+		<table>
+		<thead>
+			<td>Direction</td>
+			<td>Bandwidth</td>
+			<td>Interface</td>
+			<td>Environment</td>
+			<td>Duration</td>
+			<td></td>
+		</thead>
+		<tr>
+			<td>
+				U<input type="radio" name="direction" value="u"></input>
+				D<input type="radio" name="direction" value="d"></input>
+				B<input type="radio" name="direction" value="b"></input>
+			</td>
+			<td>
+				<input type="text" name="bandwidth"></input>
+			</td>
+			<td>
+				<input type="text" name="interface"></input>
+			</td>
+			<td>
+				<input type="text" name="environment"></input>
+			</td>
+			<td>
+				<input type="text" name="duration"></input>
+			</td>
+			<td>
+			<button onclick="javascript:return startSession();">Submit</button>
+			</td>
+		</tr>
+		</table>
+	</form>
+	</body>
+</html>
