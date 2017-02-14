@@ -4,7 +4,7 @@ After=syslog.target
 
 [Service]
 ExecStart=/usr/bin/uwsgi --ini /etc/ran-load-generator/sessionControllerServer.ini
-RuntimeDirectory=ran-load-generator
+RuntimeDirectory=sessionControllerServer
 RuntimeDirectoryMode=0777
 Restart=on-failure
 KillSignal=SIGQUIT

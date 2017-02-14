@@ -3,8 +3,35 @@ import sqlite3
 import json
 import time
 import sessionManagement
+import random
+from datetime import datetime
+from celery import Celery
+
+def make_celery(app):
+	celery = Celery(app.import_name, backend=app.config['CELERY_RESULT_BACKEND'],
+		broker=app.config['CELERY_BROKER_URL'])
+	celery.conf.update(app.config)
+	TaskBase = celery.Task
+	class ContextTask(TaskBase):
+		abstract = True
+		def __call__(self, *args, **kwargs):
+			with app.app_context():
+				return TaskBase.__call__(self, *args, **kwargs)
+	celery.Task = ContextTask
+	return celery
 
 application = Flask(__name__)
+
+application.config.update(
+	CELERY_BROKER_URL='amqp://guest@localhost//',
+	CELERY_RESULT_BACKEND='amqp://guest@localhost//'
+)
+
+celery = make_celery(application)
+
+@celery.task(name='sessionControllerServer.create_session_task')
+def create_session_task(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port):
+	sessionManagement.createSession(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port)
 
 @application.route('/')
 def spec():
@@ -44,6 +71,11 @@ Optional:
 -datagram-size : in bytes
 -remote_port : remote port to be used in test
 -local_port : local port to be used in test
+
+GET /environments
+
+return list of configured test environments
+
 </pre></body></html>"""
 
 	return spec
@@ -87,8 +119,6 @@ def get_session(session_id):
 
 def create_session():
 
-	print request.form['environment']
-
 	direction = request.form['direction']
 	bandwidth = request.form['bandwidth']
 	duration = request.form['duration']
@@ -110,9 +140,11 @@ def create_session():
 	except:
 		local_port = random.randint(5000,8000)
 	
-	s = sessionManagement.createSession(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port)
+	session = random.randint(0,1000000)
 
-	return str(s)
+	create_session_task.delay(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port)
+
+	return str(session)
 
 @application.route('/session/<session_id>', methods=['DELETE'])
 	
@@ -122,5 +154,9 @@ def terminate_session(session_id):
 	s = sessionManagement.getSession(session_id)
 	return jsonify(s)
 	
+@application.route('/environments/', methods=['GET'])
+def get_environments():
+	return jsonify(sessionManagement.getEnvironments())
+
 if __name__ == "__main__":
-    application.run()
+    application.run(host='0.0.0.0')

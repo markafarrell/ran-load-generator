@@ -23,7 +23,7 @@ def usage():
 
 if __name__ == '__main__':
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hd:b:t:i:e:sr:l:", ["help", "direction=", "bandwidth=", "time=", "interface=", "environment=", "sql", "remote_port=", "local_port="])
+		opts, args = getopt.getopt(sys.argv[1:], "hd:b:t:i:e:s:r:l:o:", ["help", "direction=", "bandwidth=", "time=", "interface=", "environment=", "session", "remote_port=", "local_port=", "output"])
 	except getopt.GetoptError as err:
 		# print help information and exit:
 		print str(err)  # will print something like "option -a not recognized"
@@ -38,6 +38,7 @@ if __name__ == '__main__':
 	sql = False
 	remote_port = -1
 	local_port = -1
+	session = -1
 
 	for o, a in opts:
 		if o in ("-h", "--help"):
@@ -81,8 +82,11 @@ if __name__ == '__main__':
 			except:
 				usage()
 				sys.exit()
-		elif o in ("-s", "--sql"):
-			sql = True
+		elif o in ("-s", "--session"):
+			session = a
+		elif o in ("-o", "--output"):
+			if a == "sql":
+				sql = True
 		else:
 			assert False, "unhandled option"
 
@@ -100,7 +104,8 @@ if __name__ == '__main__':
 		
 	datagram_size = 1400
 
-	session = random.randint(0,1000000)
+	if session == -1:
+		session = random.randint(0,1000000)
 	
 	sessionManagement.session = session
 	sessionManagement.environment = environment

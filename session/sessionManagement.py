@@ -27,6 +27,9 @@ def get_cursor():
 
 	return (c, conn)
 
+def getEnvironments():
+	return config['servers'].keys()
+
 def kill_test():
 	print "Killing Test"
 	if csv2sqlite_process != None:
@@ -53,14 +56,14 @@ def runiPerfRemote(direction, bandwidth, duration, interface, environment, datag
 	if(direction == 'd' or direction == 'b'):
 		iperf_command = "iperf-2.0.5 -c $SSH_CLIENT -u -i1 -fm -t" + str(duration) + " -b " + str(bandwidth) + "M" + " -l" + str(datagram_size) + " -p" + str(local_port) + " " + str(test_flag) + " -L" + str(remote_port) + " -yC > iperf_logs/" + str(session) + " & echo $!"
 		ssh_cmd = [ ssh_path, "-q", "-o", "StrictHostKeyChecking=no", "-b", interface, "-o", "BindAddress=" + interface, environment['username'] + "@" + environment['hostname'], "-p", str(environment['ssh_port']), "-i", environment['ssh_key'], iperf_command ]
-		print ' '.join(ssh_cmd)
+		#print ' '.join(ssh_cmd)
 		remote_pid = check_output(ssh_cmd)
-		print remote_pid
+		#print remote_pid
 	elif(direction == 'u'):
 		iperf_command = "iperf-2.0.5 -s -u -i1 -fm -t" + str(duration) + " -b " + str(bandwidth) + "M" + " -l" + str(datagram_size) + " -p" + str(remote_port) + " " + str(test_flag) + " -yC > iperf_logs/" + str(session) + " & echo $!"
 		ssh_cmd = [ ssh_path, "-q", "-o", "StrictHostKeyChecking=no", "-b", interface, "-o", "BindAddress=" + interface, environment['username'] + "@" + environment['hostname'], "-p", str(environment['ssh_port']), "-i", environment['ssh_key'], iperf_command ]
 		remote_pid = check_output(ssh_cmd)
-		print remote_pid
+		#print remote_pid
 	else:
 		#TODO: handle incorrect direction
 		pass
@@ -74,8 +77,7 @@ def updateLocalPID(session, pid):
 	conn.commit()
 	
 def insertSessionRecord(session, environment, remote_ip, remote_port, local_ip, local_port, bandwidth, direction, start_time, duration, local_pid, remote_pid):
-	conn = sqlite3.connect(config['database_path'])
-	c = conn.cursor();
+	(c, conn) = get_cursor()
 	
 	c.execute('''INSERT INTO SESSIONS (SESSION_ID, REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT, COMPLETE)
 				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)''', (session, remote_ip, remote_port, local_ip, local_port, bandwidth, direction, start_time, duration, local_pid, remote_pid, environment, 0))
@@ -132,7 +134,7 @@ def runiPerfLocal(direction, bandwidth, duration, interface, environment, datagr
 				kill_test()
 			except:
 				kill_test()
-
+	
 def killRemoteSession(session):
 	try:
 		environment = config['servers'][session['ENVIRONMENT']]
@@ -199,7 +201,7 @@ def getSessions():
 	return sessions
 	
 def getSession(session_id):
-	c = get_cursor()
+	(c, conn) = get_cursor()
 
 	c.execute('''SELECT SESSION_ID, REMOTE_IP, REMOTE_PORT, LOCAL_IP, LOCAL_PORT, BANDWIDTH, DIRECTION, START_TIME, DURATION, LOCAL_PID, REMOTE_PID, ENVIRONMENT, COMPLETE FROM 
 					SESSIONS WHERE SESSION_ID = ?''', [session_id])
@@ -273,10 +275,6 @@ def getSessionsAfter(timestamp):
 			session[c.description[i][0]] = row[i]
 		sessions.append(session)
 	
-def createSession(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port):
+def createSession(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port):
 
-	session = random.randint(0,1000000)
-	
-	start_session_process = Popen(["python", "-u", "startSession.py", "-d", direction, "-b", str(bandwidth), "-t", str(duration), "-i", interface, "-e", environment, "-s" ])
-	
-	return session
+	start_session_process = Popen(["python", "-u", "startSession.py", "-d", direction, "-b", str(bandwidth), "-t", str(duration), "-i", interface, "-e", environment, "-s", str(session), "-o", "sql" ])
