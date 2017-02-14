@@ -58,12 +58,25 @@ sudo cp config/sessionControllerServer.service /etc/systemd/system/
 sudo systemctl start sessionControllerServer
 sudo systemctl enable sessionControllerServer
 
+sudo cp config/sessionControllerServer-celery.service /etc/systemd/system/
+sudo cp config/sessionControllerServer-celery.conf /etc/ran-load-generator/
+
+sudo systemctl start sessionControllerServer-celery
+sudo systemctl enable sessionControllerServer-celery
+
 sudo cp config/ran-load-generator.nginx.conf /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/ran-load-generator.nginx.conf /etc/nginx/sites-enabled/
 
 sudo chown -R www-data:www-data /var/www
 
 sudo systemctl reload nginx
+
+sudo pip install celery
+
+sudo apt-get install rabbitmq-server
+
+sudo cp config/sessionControllerServer-celery.service /etc/systemd/system
+sudo cp config/sessionControllerServer-celery.conf /etc/ran-load-generator/
 
 ##REST Interface Specification:
 
@@ -110,3 +123,7 @@ Optional:
 -remote_port : remote port to be used in test
 
 -local_port : local port to be used in test
+
+GET /environments
+
+return list of configured test environments
