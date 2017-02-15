@@ -80,13 +80,13 @@ sudo chown www-data:www-data /var/log/ran-load-generator
 sudo mkdir /etc/ran-load-generator
 
 # Copy config files to /etc/ran-load-generator
-sudo cp config/reportProvider.ini /etc/ran-load-generator/
+sudo cp config/reportService.ini /etc/ran-load-generator/
 
 # Copy init file to /etc/systemd/system
-sudo cp config/reportProvider.service /etc/systemd/system/
+sudo cp config/reportService.service /etc/systemd/system/
 
-sudo systemctl start reportProvider
-sudo systemctl enable reportProvider
+sudo systemctl start reportService
+sudo systemctl enable reportService
 
 sudo cp config/ran-load-generator.nginx.conf /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/ran-load-generator.nginx.conf /etc/nginx/sites-enabled/

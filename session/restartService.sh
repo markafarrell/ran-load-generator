@@ -1,3 +1,3 @@
-sudo systemctl stop sessionControllerServer && sudo systemctl start sessionControllerServer
-sudo systemctl stop sessionControllerServer-celery
-sudo systemctl start sessionControllerServer-celery
+sudo systemctl stop sessionService && sudo systemctl start sessionService
+sudo systemctl stop sessionService-celery
+sudo systemctl start sessionService-celery

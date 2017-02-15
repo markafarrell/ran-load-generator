@@ -72,19 +72,13 @@ sudo chown www-data:www-data /var/log/ran-load-generator
 sudo mkdir /etc/ran-load-generator
 
 ###Copy config files to /etc/ran-load-generator
-sudo cp config/sessionControllerServer.ini /etc/ran-load-generator/
+sudo cp config/sessionService.ini /etc/ran-load-generator/
 
 ###Copy init file to /etc/systemd/system
-sudo cp config/sessionControllerServer.service /etc/systemd/system/
+sudo cp config/sessionService.service /etc/systemd/system/
 
-sudo systemctl start sessionControllerServer
-sudo systemctl enable sessionControllerServer
-
-sudo cp config/sessionControllerServer-celery.service /etc/systemd/system/
-sudo cp config/sessionControllerServer-celery.conf /etc/ran-load-generator/
-
-sudo systemctl start sessionControllerServer-celery
-sudo systemctl enable sessionControllerServer-celery
+sudo systemctl start sessionService
+sudo systemctl enable sessionService
 
 sudo cp config/ran-load-generator.nginx.conf /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/ran-load-generator.nginx.conf /etc/nginx/sites-enabled/
@@ -97,8 +91,11 @@ sudo pip install celery
 
 sudo apt-get install rabbitmq-server
 
-sudo cp config/sessionControllerServer-celery.service /etc/systemd/system
-sudo cp config/sessionControllerServer-celery.conf /etc/ran-load-generator/
+sudo cp config/sessionService-celery.service /etc/systemd/system/
+sudo cp config/sessionService-celery.conf /etc/ran-load-generator/
+
+sudo systemctl start sessionService-celery
+sudo systemctl enable sessionService-celery
 
 ##REST Interface Specification:
 

@@ -61,6 +61,8 @@ modem status
 
 -i: Interval between getting modem status
 
+-t: Duration to capture status (seconds)
+
 -c: Output as csv
 
 -j: Output as json
@@ -139,13 +141,13 @@ sudo chown www-data:www-data /var/log/ran-load-generator
 sudo mkdir /etc/ran-load-generator
 
 # Copy config files to /etc/ran-load-generator
-sudo cp config/statusProvider.ini /etc/ran-load-generator/
+sudo cp config/statusService.ini /etc/ran-load-generator/
 
 # Copy init file to /etc/systemd/system
-sudo cp config/statusProvider.service /etc/systemd/system/
+sudo cp config/statusService.service /etc/systemd/system/
 
-sudo systemctl start statusProvider
-sudo systemctl enable statusProvider
+sudo systemctl start statusService
+sudo systemctl enable statusService
 
 sudo cp config/ran-load-generator.nginx.conf /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/ran-load-generator.nginx.conf /etc/nginx/sites-enabled/
@@ -153,4 +155,10 @@ sudo ln -s /etc/nginx/sites-available/ran-load-generator.nginx.conf /etc/nginx/s
 sudo chown -R www-data:www-data /var/www
 
 sudo systemctl reload nginx
+
+sudo cp config/statusService-celery.service /etc/systemd/system/
+sudo cp config/statusService-celery.conf /etc/ran-load-generator/
+
+sudo systemctl start statusService-celery
+sudo systemctl enable statusService-celery
 

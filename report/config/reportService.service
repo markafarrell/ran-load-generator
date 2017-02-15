@@ -1,10 +1,10 @@
 [Unit]
-Description=statusProvider uWSGI app
+Description=reportService uWSGI app
 After=syslog.target
 
 [Service]
-ExecStart=/usr/bin/uwsgi --ini /etc/ran-load-generator/statusProvider.ini
-RuntimeDirectory=statusProvider
+ExecStart=/usr/bin/uwsgi --ini /etc/ran-load-generator/reportService.ini
+RuntimeDirectory=reportService
 RuntimeDirectoryMode=0777
 Restart=on-failure
 KillSignal=SIGQUIT

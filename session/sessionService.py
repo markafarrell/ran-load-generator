@@ -6,9 +6,10 @@ import sessionManagement
 import random
 from datetime import datetime
 from celery import Celery
+from kombu import Queue
 
 def make_celery(app):
-	celery = Celery(app.import_name, backend=app.config['CELERY_RESULT_BACKEND'],
+	celery = Celery(app.import_name, backend=app.config['result_backend'],
 		broker=app.config['CELERY_BROKER_URL'])
 	celery.conf.update(app.config)
 	TaskBase = celery.Task
@@ -24,12 +25,14 @@ application = Flask(__name__)
 
 application.config.update(
 	CELERY_BROKER_URL='amqp://guest@localhost//',
-	CELERY_RESULT_BACKEND='amqp://guest@localhost//'
+	result_backend='amqp://guest@localhost//'
 )
 
 celery = make_celery(application)
 
-@celery.task(name='sessionControllerServer.create_session_task')
+celery.conf.task_routes = {'sessionService.*': {'queue': 'sessionService'}}
+
+@celery.task(name='sessionService.create_session_task')
 def create_session_task(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port):
 	sessionManagement.createSession(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port)
 

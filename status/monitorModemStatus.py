@@ -31,6 +31,8 @@ modem status
 
 -i: Interval between getting modem status
 
+-t: Duration to run for
+
 -c: Output as csv
 
 -j: Output as json
@@ -56,6 +58,8 @@ def insertModemStatus(output_file,d):
 	
 	conn = sqlite3.connect(output_file)
 	c = conn.cursor();
+
+	print d
 	
 	c.execute('''INSERT INTO DEVICE_STATUS (DEVICE_IP,TIMESTAMP,APN,BAND,CHANNEL,IMEI,IMSI,MME,MME_ID,PCI,PLMN,RAT,RSRP,SINR,SVN,TAC,WWAN_IP,CELL_ID,ENODEB_ID)
 				VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (d['LAN_IP'], d['Timestamp'], d['APN'], d['Band'], d['Channel'], d['IMEI'], d['IMSI'], d['MME'], d['MME Id'], d['PCI'], d['PLMN'], d['RAT'], d['RSRP'], d['SINR'], d['SVN'], d['TAC'], d['WWAN_IP'], d['cellId'], d['eNodeBId']))
@@ -64,9 +68,13 @@ def insertModemStatus(output_file,d):
 
 def runGetStatus():
 	next_call = time.time()
+	end_time = time.time() + duration
 	while True:
+		if time.time() > end_time:
+			sys.exit()	
 		try:
 			o = {}
+	
 			o = getModemStatus.getStatus(modem_LAN_ip,admin_password)
 			if output_format == "json":
 				print getModemStatus.generateJSON(o)
@@ -76,15 +84,14 @@ def runGetStatus():
 			else:
 				print getModemStatus.generateJSON(o)
 				
-			
+			if sql:
+				insertModemStatus(output_file,o)
+				
 		except:
-			#print "Getting status failed."
+			print "Getting status failed."
 			#TODO: print an error to stderr
 			pass
 			
-		if sql:
-			
-			insertModemStatus(output_file,o)
 		
 		next_call = next_call+interval;
 		time.sleep(next_call - time.time())
@@ -96,7 +103,7 @@ if __name__ == '__main__':
 	interval = 1
 	
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hm:p:i:jcso:", ["help", "modem=", "password=","interval=","json","csv","sql","output"])
+		opts, args = getopt.getopt(sys.argv[1:], "hm:p:i:jcso:t:", ["help", "modem=", "password=","interval=","json","csv","sql","output","duration"])
 	except getopt.GetoptError as err:
 		# print help information and exit:
 		print str(err)  # will print something like "option -a not recognized"
@@ -120,6 +127,8 @@ if __name__ == '__main__':
 			interval_str = a
 		elif o in ("-c", "--csv"):
 			output_format = "csv"
+		elif o in ("-t", "--duration"):
+			duration = int(a)
 		elif o in ("-j", "--json"):
 			output_format = "json"
 		elif o in ("-s", "--sql"):
@@ -157,8 +166,8 @@ if __name__ == '__main__':
 	timerThread.daemon = True
 	timerThread.start()
 	
-	while True:
-		try:
-			time.sleep(0.1)
-		except KeyboardInterrupt:
-			sys.exit()
+	
+	try:
+		timerThread.join()
+	except KeyboardInterrupt:
+		sys.exit()
