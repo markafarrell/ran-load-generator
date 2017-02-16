@@ -7,6 +7,7 @@ csv data from reportProvider
 csv (identical to csv2filteredcsv)
 
 ##flags:
+~~~~
 -h: host to connect to
 
 -p: port to connect to
@@ -18,7 +19,7 @@ csv (identical to csv2filteredcsv)
 -o: output file
 
 Note: output always goes to stdout regardless if -o is used.
-
+~~~~
 ##Purpose:
 Get test data over a HTTP.
 
@@ -36,7 +37,7 @@ Allow clients to retrieve data from the sqlite database via a HTTP.
 Allow clients to determine what tests are current (have data after a set timestamp)
 
 ##REST Interface Spec:
-
+~~~~
 GET /sessions
 
 return list of all sessions in database. i.e. all unique test ids
@@ -60,29 +61,34 @@ return all data for [session_id] after [timestamp]
 GET /session/all/[timestamp]
 
 return all data for all sessions after [timestamp]
-
+~~~~
 Installing:
 
 # Install Dependancies
-
+~~~~
 sudo apt-get install build-essential python-dev python-pip uswgi uwsgi-plugin-python nginx
 sudo pip install flask
-
+~~~~
 # Create a directory for the UNIX sockets
+~~~~
 sudo mkdir /var/run/ran-load-generator
 sudo chown www-data:www-data /var/run/ran-load-generator
-
+~~~~
 # Create a directory for the logs
+~~~~
 sudo mkdir /var/log/ran-load-generator
 sudo chown www-data:www-data /var/log/ran-load-generator
-
+~~~~
 # Create a directory for the configs
+~~~~
 sudo mkdir /etc/ran-load-generator
-
+~~~~
 # Copy config files to /etc/ran-load-generator
+~~~~
 sudo cp config/reportService.ini /etc/ran-load-generator/
-
+~~~~
 # Copy init file to /etc/systemd/system
+~~~~
 sudo cp config/reportService.service /etc/systemd/system/
 
 sudo systemctl start reportService
@@ -94,3 +100,4 @@ sudo ln -s /etc/nginx/sites-available/ran-load-generator.nginx.conf /etc/nginx/s
 sudo chown -R www-data:www-data /var/www
 
 sudo systemctl reload nginx
+~~~~
