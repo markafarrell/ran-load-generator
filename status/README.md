@@ -7,6 +7,7 @@ None
 JSON
 
 ##flags:
+~~~~
 -m: Modem IP address. (default 192.168.1.1)
 
 -h: Display help.
@@ -37,11 +38,11 @@ Retreive status information from the connected modem.
     "cellId": 0,
     "eNodeBId": 730003
 }
-
+~~~~
 ##Test:
-
+~~~~
 python getModemStatus.py -m 192.168.1.1 -p admin
-
+~~~~
 #monitorModemStatus
 
 ##Input:
@@ -51,6 +52,7 @@ None
 modem status
 
 ##flags:
+~~~~
 -m: Modem IP address. (default 192.168.1.1)
 
 -h: Display help.
@@ -68,21 +70,21 @@ modem status
 -j: Output as json
 
 -s: Output to sqlite database
-
+~~~~
 ##Purpose:
 Periodicly retreive status information from the connected modem.
 
 ##Sample Output:
-
+~~~~
 Timestamp,Device IP,APN,Band,Channel,IMEI,IMSI,MME,MME Id,PCI,PLMN,RAT,RSRP,SINR,SVN,TAC,WWAN_IP,cellId,eNodeBId
 2017-02-15 10:18:19,192.168.1.1,telstra.LANES,LTE B3,1275,351588071475585,505720004200015,NHE7,152,263,505-01,LTE,-85,12,01,12290,10.96.197.37,3,530183
 2017-02-15 10:18:24,192.168.1.1,telstra.LANES,LTE B3,1275,351588071475585,505720004200015,NHE7,152,263,505-01,LTE,-85,13,01,12290,10.96.197.37,3,530183
 2017-02-15 10:18:29,192.168.1.1,telstra.LANES,LTE B3,1275,351588071475585,505720004200015,NHE7,152,263,505-01,LTE,-85,13,01,12290,10.96.197.37,3,530183
-
+~~~~
 ##Test:
-
+~~~~
 python monitorModemStatus.py -i 5 -c
-
+~~~~
 #statusProvider
 
 ##Input:
@@ -92,15 +94,16 @@ REST requests from statusRetriever for data
 csv or json as per REST Interface Spec
 
 ##flags:
+~~~~
 -o: location of sqlite database file. Mandatory
 
 -p: port to listen on
-
+~~~~
 ##Purpose:
 Allow clients to retrieve data from the sqlite database via HTTP.
 
 ##REST Interface Spec:
-
+~~~~
 GET /devices
 
 return list of all devices in database.
@@ -120,30 +123,36 @@ return latest data for [device_name]
 GET /session/[device_name]/[timestamp]
 
 return all data for [device_name] after [timestamp]
-
+~~~~
 Installing:
 
 # Install Dependancies
-
+~~~~
 sudo apt-get install build-essential python-dev python-pip uswgi uwsgi-plugin-python nginx
 
 sudo pip install flask
-
+sudo pip install celery
+~~~~
 # Create a directory for the UNIX sockets
+~~~~
 sudo mkdir /var/run/ran-load-generator
 sudo chown www-data:www-data /var/run/ran-load-generator
-
+~~~~
 # Create a directory for the logs
+~~~~
 sudo mkdir /var/log/ran-load-generator
 sudo chown www-data:www-data /var/log/ran-load-generator
-
+~~~~
 # Create a directory for the configs
+~~~~
 sudo mkdir /etc/ran-load-generator
-
+~~~~
 # Copy config files to /etc/ran-load-generator
+~~~~
 sudo cp config/statusService.ini /etc/ran-load-generator/
-
+~~~~
 # Copy init file to /etc/systemd/system
+~~~~
 sudo cp config/statusService.service /etc/systemd/system/
 
 sudo systemctl start statusService
@@ -162,3 +171,4 @@ sudo cp config/statusService-celery.conf /etc/ran-load-generator/
 sudo systemctl start statusService-celery
 sudo systemctl enable statusService-celery
 
+~~~~
