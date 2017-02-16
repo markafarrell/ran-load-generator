@@ -7,6 +7,7 @@ None
 iperf results
 
 ##flags:
+~~~~
 -h: print help
 
 -d: direction (u-Uplink, d-Downlink or b-Bidirectional)
@@ -26,15 +27,16 @@ iperf results
 -e: test enviornment to use (from config/servers.conf)
 
 -s: session id to tag results with
-
+~~~~
 ##Purpose:
 Start a test session
 
 ##Test:
+~~~~
 sudo -u www-data python startSession.py -d d -b 10 -t 10 -i 192.168.1.4 -e windsor_production
-
+~~~~
 ##Sample Output:
-
+~~~~
 starting iPerf Remote
 iPerf Remote started
 Starting iPerf Local
@@ -51,30 +53,36 @@ Killing Test
 Killing csv2filteredcsv
 Killing iperf
  Test Complete
+~~~~
 
 #Installing Service:
 
 ###Install Dependancies
-
+~~~~
 sudo apt-get install build-essential python-dev python-pip uswgi uwsgi-plugin-python nginx
 
 sudo pip install flask
-
+~~~~
 ###Create a directory for the UNIX sockets
+~~~~
 sudo mkdir /var/run/ran-load-generator
 sudo chown www-data:www-data /var/run/ran-load-generator
-
+~~~~
 ###Create a directory for the logs
+~~~~
 sudo mkdir /var/log/ran-load-generator
 sudo chown www-data:www-data /var/log/ran-load-generator
-
+~~~~
 ###Create a directory for the configs
+~~~~
 sudo mkdir /etc/ran-load-generator
-
+~~~~
 ###Copy config files to /etc/ran-load-generator
+~~~~
 sudo cp config/sessionService.ini /etc/ran-load-generator/
-
+~~~~
 ###Copy init file to /etc/systemd/system
+~~~~
 sudo cp config/sessionService.service /etc/systemd/system/
 
 sudo systemctl start sessionService
@@ -97,8 +105,10 @@ sudo cp config/sessionService-celery.conf /etc/ran-load-generator/
 sudo systemctl start sessionService-celery
 sudo systemctl enable sessionService-celery
 
+sudo chown www-data:www-data blackbird-key.openssh
+~~~~
 ##REST Interface Specification:
-
+~~~~
 GET /sessions
 
 return list of all sessions in database. i.e. all unique test ids
@@ -146,3 +156,4 @@ Optional:
 GET /environments
 
 return list of configured test environments
+~~~~
