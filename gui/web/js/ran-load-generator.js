@@ -7,7 +7,15 @@ function startSession()
 	{
 		alert(data);
 	});
-	$.post("status/device/192.168.1.1", post_data, 
+
+	return false;
+}
+
+function startLogging()
+{
+	post_data = $('#status_logging').serialize();
+	modem_ip = $('#modem').val();
+	$.post("status/device/" + modem_ip, post_data, 
 	function (data,status,xhr)
 	{
 		alert(data);

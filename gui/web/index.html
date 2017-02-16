@@ -34,7 +34,24 @@
 				<input type="text" name="duration"></input>
 			</td>
 			<td>
-			<button onclick="javascript:return startSession();">Submit</button>
+				<button onclick="javascript:return startSession();">Submit</button>
+			</td>
+		</tr>
+		</table>
+	</form>
+	<form name="status_logging" id="status_logging">
+		<table>
+		<thead>
+			<td>Modem</td>
+			<td>Duration</td>
+			<td>Interval</td>
+		</thead>
+		<tr>
+			<td><input type="text" name="modem" id="modem"></input></td>
+			<td><input type="text" name="duration"></input></td>
+			<td><input type="text" name="interval"></input></td>
+			<td>
+				<button onclick="javascript:return startLogging();">Submit</button>
 			</td>
 		</tr>
 		</table>
