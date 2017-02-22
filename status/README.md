@@ -128,7 +128,7 @@ Installing:
 
 # Install Dependancies
 ~~~~
-sudo apt-get install build-essential python-dev python-pip uswgi uwsgi-plugin-python nginx
+sudo apt-get install build-essential python-dev python-pip uwsgi uwsgi-plugin-python nginx
 
 sudo pip install flask
 sudo pip install celery
