@@ -107,6 +107,8 @@ sudo systemctl start sessionService-celery
 sudo systemctl enable sessionService-celery
 
 sudo chown www-data:www-data blackbird-key.openssh
+
+sudo systemctl reload nginx
 ~~~~
 ##REST Interface Specification:
 ~~~~
