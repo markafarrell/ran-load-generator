@@ -59,7 +59,7 @@ Killing iperf
 
 ###Install Dependancies
 ~~~~
-sudo apt-get install build-essential python-dev python-pip uswgi uwsgi-plugin-python nginx
+sudo apt-get install build-essential python-dev python-pip uwsgi uwsgi-plugin-python nginx
 
 sudo pip install flask
 ~~~~
@@ -90,6 +90,7 @@ sudo systemctl enable sessionService
 
 sudo cp config/ran-load-generator.nginx.conf /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/ran-load-generator.nginx.conf /etc/nginx/sites-enabled/
+sudo rm /etc/nginx/sites-enabled/default
 
 sudo chown -R www-data:www-data /var/www
 
