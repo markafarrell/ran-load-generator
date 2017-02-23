@@ -81,6 +81,8 @@ Columns:
 ~~~
 sudo chown pi:www-data database/
 
-sudo chmod g+x database/
+sudo chmod g+w database/
+
+sudo chown www-data:www-data database/ran-load-generator.sqlite
 ~~~
 
