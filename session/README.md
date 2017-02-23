@@ -110,6 +110,20 @@ sudo chown www-data:www-data blackbird-key.openssh
 
 sudo systemctl reload nginx
 ~~~~
+
+###Fix SSH login speed
+
+Edit ssh_config
+~~~
+sudo nano /etc/ssh/ssh_config
+~~~~
+Disable GSSAPI authentication
+~~~~
+#Change 
+GSSAPIAuthentication yes
+#to
+GSSAPIAuthentication no
+~~~~
 ##REST Interface Specification:
 ~~~~
 GET /sessions
