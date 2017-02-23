@@ -171,4 +171,7 @@ sudo cp config/statusService-celery.conf /etc/ran-load-generator/
 sudo systemctl start statusService-celery
 sudo systemctl enable statusService-celery
 
+sudo systemctl start statusService
+sudo systemctl enable statusService
+
 ~~~~
