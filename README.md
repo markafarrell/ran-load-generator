@@ -194,6 +194,7 @@ to /etc/default/hostapd
 
 ~~~~
 sudo cp wifi/config/dnsmasq.conf /etc/
+sudo chown dnsmasq:root  /var/lib/misc/dnsmasq.leases
 ~~~~
 
 ###Configure ip fowarding
@@ -208,13 +209,11 @@ sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
 ~~~~
 
 ### Start Service
+~~~~
 sudo systemctl start hostapd
 sudo systemctl enable hostapd
 sudo systemctl start dnsmasq
 sudo systemctl enable dnsmasq
-
-~~~~
-sudo chown dnsmasq:root  /var/lib/misc/dnsmasq.leases
 ~~~~
 
 
