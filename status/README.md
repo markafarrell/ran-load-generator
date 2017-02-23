@@ -120,6 +120,10 @@ GET /session/[device_name]/latest
 
 return latest data for [device_name]
 
+GET /device/[device_name]/current
+
+return current(live) data for [device_name]
+
 GET /session/[device_name]/[timestamp]
 
 return all data for [device_name] after [timestamp]
