@@ -188,12 +188,13 @@ Add
 ~~~~
 DAEMON_CONF="/etc/hostapd/hostapd.conf"
 ~~~~
-to 
-/etc/default/hostapd
+to /etc/default/hostapd
 
 ###Configure DNSmasq
+
 ~~~~
 sudo cp wifi/config/dnsmasq.conf /etc/
+~~~~
 
 ###Configure ip fowarding
 Add
