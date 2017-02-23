@@ -85,9 +85,6 @@ sudo cp config/sessionService.ini /etc/ran-load-generator/
 ~~~~
 sudo cp config/sessionService.service /etc/systemd/system/
 
-sudo systemctl start sessionService
-sudo systemctl enable sessionService
-
 sudo cp config/ran-load-generator.nginx.conf /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/ran-load-generator.nginx.conf /etc/nginx/sites-enabled/
 sudo rm /etc/nginx/sites-enabled/default
@@ -105,6 +102,8 @@ sudo cp config/sessionService-celery.conf /etc/ran-load-generator/
 
 sudo systemctl start sessionService-celery
 sudo systemctl enable sessionService-celery
+sudo systemctl start sessionService
+sudo systemctl enable sessionService
 
 sudo chown www-data:www-data blackbird-key.openssh
 
