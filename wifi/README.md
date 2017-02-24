@@ -61,5 +61,23 @@ sudo systemctl start dnsmasq
 sudo systemctl enable dnsmasq
 ~~~~
 
+###Disable Power Save for WiFi
+Add 
+~~~~
+wireless-power off
+~~~~
+under 
+~~~~
+iface wlan0 inet manual
+~~~~
+in /etc/network/interfaces
 
+###Fix DNSMASQ startup file
+
+Add
+~~~~
+After=network-online.target
+Wants=network-online.target
+~~~~
+in the [Unit] section of /lib/systemd/system/dnsmasq.service
 
