@@ -76,8 +76,9 @@ in /etc/network/interfaces
 
 Add
 ~~~~
-After=network-online.target
-Wants=network-online.target
+Requires=sys-subsystem-net-devices-wlan0.device
+After=sys-subsystem-net-devices-wlan0.device
+Wants=sys-subsystem-net-devices-wlan0.device
 ~~~~
 in the [Unit] section of /lib/systemd/system/dnsmasq.service
 
