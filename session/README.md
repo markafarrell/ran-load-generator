@@ -145,6 +145,10 @@ GET /sessions/[session_id]
 
 return details of [session_id]
 
+DELETE /sessions/[session_id]
+
+Kill Session [session_id]
+
 POST /session/
 
 FORM fields:

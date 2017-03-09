@@ -56,5 +56,22 @@
 		</tr>
 		</table>
 	</form>
+	<form name="kill_session" id="kill_session">
+		<table>
+		<thead>
+			<td>Session</td>
+		</thead>
+		<tr>
+			<td><input type="text" name="kill_session_id" id="kill_session_id"></input></td>
+			<td>
+				<button onclick="javascript:return killSession();">Submit</button>
+			</td>
+		</tr>
+		</table>
+	</form>
+	<div id="current_status">
+	</div>
+	<div id="current_sessions">
+	</div>
 	</body>
 </html>

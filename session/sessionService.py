@@ -59,6 +59,10 @@ GET /sessions/[session_id]
 
 return details of [session_id]
 
+DELETE /sessions/[session_id]
+
+Kill Session [session_id]
+
 POST /session/
 
 FORM fields:
@@ -149,7 +153,7 @@ def create_session():
 
 	return str(session)
 
-@application.route('/session/<session_id>', methods=['DELETE'])
+@application.route('/session/<int:session_id>', methods=['DELETE'])
 	
 def terminate_session(session_id):
 	s = sessionManagement.getSession(session_id)

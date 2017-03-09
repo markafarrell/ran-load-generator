@@ -136,10 +136,15 @@ def runiPerfLocal(direction, bandwidth, duration, interface, environment, datagr
 				kill_test()
 	
 def killRemoteSession(session):
+	if os.name == "posix":
+		ssh_path = "ssh"
+	else:
+		ssh_path = "ssh\ssh"
+
 	try:
 		environment = config['servers'][session['ENVIRONMENT']]
 		kill_cmd = "kill -9 " + str(session['REMOTE_PID'])
-		ssh_cmd = "ssh\ssh -q -o StrictHostKeyChecking=no -b" + session['LOCAL_IP'] + " -o BindAddress=" + session['LOCAL_IP'] + " " + environment['username'] + "@" + environment['hostname'] + " -p " + str(environment['ssh_port']) + " -i " + environment['ssh_key'] + " \"" + kill_cmd + "\""
+		ssh_cmd = [ ssh_path, "-q", "-o", "StrictHostKeyChecking=no", "-b", session['LOCAL_IP'], "-o", "BindAddress=" + session['LOCAL_IP'], environment['username'] + "@" + environment['hostname'], "-p", str(environment['ssh_port']), "-i", environment['ssh_key'], kill_cmd ]
 		res = check_output(ssh_cmd)
 	except:
 		res = True
@@ -148,7 +153,7 @@ def killRemoteSession(session):
 	
 def killLocalSession(session):
 	try:
-		os.kill(session['LOCAL_PID'], signal.SIGTERM)
+		os.kill(session['LOCAL_PID'], signal.SIGKILL)
 		return 1
 	except:
 		return 0
