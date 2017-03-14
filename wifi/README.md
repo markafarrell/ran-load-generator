@@ -74,6 +74,14 @@ in /etc/network/interfaces
 
 ###Fix DNSMASQ startup file
 
+
+Add
+~~~~
+Restart=on-failure
+RestartSec=5
+~~~~
+at the bottom of the [Service] section  of /lib/systemd/system/dnsmasq.service
+
 Add
 ~~~~
 Requires=sys-subsystem-net-devices-wlan0.device
