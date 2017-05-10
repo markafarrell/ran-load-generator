@@ -68,9 +68,8 @@ function updateChartData() {
 		//var x = d3.scaleTime().range([0, width]);
 		//var y = d3.scaleLinear().range([height, 0]);
 
-		//var svg = d3.select("body").transition();
 		// Make the changes
-		var svg = d3.select("body");
+		var svg = d3.select("#chart");
 
 		y.domain([0, d3.max(dateTimeVector, function(d) { return d.THROUGHPUT; })]);
 		yAxisGroup.call(yAxis);
@@ -103,7 +102,7 @@ function initializeChart()
 	// append the svg obgect to the body of the page
 	// appends a 'group' element to 'svg'
 	// moves the 'group' element to the top left margin
-	var svg = d3.select("body").append("svg")
+	var svg = d3.select("#chart").append("svg")
 		.attr("width", width + margin.left + margin.right)
 		.attr("height", height + margin.top + margin.bottom)
 	.append("g")
