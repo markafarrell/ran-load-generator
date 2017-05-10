@@ -2,6 +2,17 @@
 	<head>
 		<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
 		<script type="text/javascript" src="js/ran-load-generator.js"></script>
+		<script type="text/javascript" src="js/d3.v4.min.js"></script>
+
+		<style> /* set the CSS */
+			.line 
+			{
+				fill: none;
+				stroke: steelblue;
+				stroke-width: 2px;
+			}
+		</style>
+		
 	</head>
 	<body>
 	<h1>PiPerf</h1>
@@ -77,6 +88,8 @@
 	</div>
 	<h2>Current Sessions</h2>
 	<div id="current_sessions">
+	</div>
+	<div id="chart">
 	</div>
 	</body>
 </html>
