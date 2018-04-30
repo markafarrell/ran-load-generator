@@ -33,8 +33,8 @@ celery = make_celery(application)
 celery.conf.task_routes = {'sessionService.*': {'queue': 'sessionService'}}
 
 @celery.task(name='sessionService.create_session_task')
-def create_session_task(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port):
-	sessionManagement.createSession(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port)
+def create_session_task(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, tos):
+	sessionManagement.createSession(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, tos)
 
 @application.route('/')
 def spec():
@@ -78,6 +78,7 @@ Optional:
 -datagram-size : in bytes
 -remote_port : remote port to be used in test
 -local_port : local port to be used in test
+-tos : IPv4 TOS to be used
 
 GET /environments
 
@@ -147,9 +148,14 @@ def create_session():
 	except:
 		local_port = random.randint(5000,8000)
 	
+	try:
+		tos = int(request.form['tos'])
+	except:
+		tos = False
+
 	session = random.randint(0,1000000)
 
-	create_session_task.delay(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port)
+	create_session_task.delay(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, tos)
 
 	return str(session)
 

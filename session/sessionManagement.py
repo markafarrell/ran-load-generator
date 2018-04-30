@@ -42,7 +42,7 @@ def kill_test():
 		print "Killing iperf"
 		iperf_process.terminate()
 	
-def runiPerfRemote(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, sql):
+def runiPerfRemote(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, sql, tos=False):
 	if direction == 'b':
 		test_flag = "-d"
 	else:
@@ -54,13 +54,19 @@ def runiPerfRemote(direction, bandwidth, duration, interface, environment, datag
 		ssh_path = "ssh\ssh"
 	
 	if(direction == 'd' or direction == 'b'):
-		iperf_command = "iperf-2.0.5 -c $SSH_CLIENT -u -i1 -fm -t" + str(duration) + " -b " + str(bandwidth) + "M" + " -l" + str(datagram_size) + " -p" + str(local_port) + " " + str(test_flag) + " -L" + str(remote_port) + " -yC > iperf_logs/" + str(session) + " & echo $!"
+		iperf_command = "iperf-2.0.5 -c $SSH_CLIENT -u -i1 -fm -t" + str(duration) + " -b " + str(bandwidth) + "M" + " -l" + str(datagram_size) + " -p" + str(local_port) + " " + str(test_flag) + " -L" + str(remote_port)
+		if tos != False:
+			iperf_command += " -S " + str(tos)
+		iperf_command += " -yC > iperf_logs/" + str(session) + " & echo $!"
 		ssh_cmd = [ ssh_path, "-q", "-o", "StrictHostKeyChecking=no", "-b", interface, "-o", "BindAddress=" + interface, environment['username'] + "@" + environment['hostname'], "-p", str(environment['ssh_port']), "-i", environment['ssh_key'], iperf_command ]
-		#print ' '.join(ssh_cmd)
+		print ' '.join(ssh_cmd)
 		remote_pid = check_output(ssh_cmd)
 		#print remote_pid
 	elif(direction == 'u'):
-		iperf_command = "iperf-2.0.5 -s -u -i1 -fm -t" + str(duration) + " -b " + str(bandwidth) + "M" + " -l" + str(datagram_size) + " -p" + str(remote_port) + " " + str(test_flag) + " -yC > iperf_logs/" + str(session) + " & echo $!"
+		iperf_command = "iperf-2.0.5 -s -u -i1 -fm -t" + str(duration) + " -b " + str(bandwidth) + "M" + " -l" + str(datagram_size) + " -p" + str(remote_port) + " " + str(test_flag)
+		if tos != False:
+			iperf_command += " -S " + str(tos)
+		iperf_command += " -yC > iperf_logs/" + str(session) + " & echo $!"
 		ssh_cmd = [ ssh_path, "-q", "-o", "StrictHostKeyChecking=no", "-b", interface, "-o", "BindAddress=" + interface, environment['username'] + "@" + environment['hostname'], "-p", str(environment['ssh_port']), "-i", environment['ssh_key'], iperf_command ]
 		remote_pid = check_output(ssh_cmd)
 		#print remote_pid
@@ -84,7 +90,7 @@ def insertSessionRecord(session, environment, remote_ip, remote_port, local_ip, 
 				
 	conn.commit()
 
-def runiPerfLocal(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, sql, session):
+def runiPerfLocal(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, sql, session, tos=False):
 	global iperf_process
 	global filteredcsv_process
 	global csv2sqlite_process
@@ -101,11 +107,25 @@ def runiPerfLocal(direction, bandwidth, duration, interface, environment, datagr
 	
 	if(direction == 'd' or direction == 'b'):
 		# bufsize=1 means line buffered
-		iperf_process = Popen([iperf_path, "-s", "-u", "-i", "1", "-l", str(datagram_size), "-p", str(local_port), "-y", "C", "-f", "m"], stdout=PIPE, bufsize=1)
+		command_array =[iperf_path, "-s", "-u", "-i", "1", "-l", str(datagram_size), "-p", str(local_port), "-y", "C", "-f", "m"]
+
+		if tos != False:
+			command_array += ["-S", str(tos)]
+
+		print ' '.join(command_array)
+
+		iperf_process = Popen(command_array, stdout=PIPE, bufsize=1)
 		filteredcsv_process = Popen(["python", "-u", "../csv2filteredcsv/csv2filteredcsv.py", "-d"], stdin=iperf_process.stdout, stdout=PIPE, bufsize=1)
 		iperf_process.stdout.close()
 	elif(direction == 'u'):
-		iperf_process = Popen([iperf_path, "-c", environment['hostname'], "-u", "-i", "1", "-l", str(datagram_size), "-p", str(remote_port), "-L", str(local_port), "-y", "C", "-t", str(duration), "-f", "m", "-b", str(bandwidth) + "M", "-L", str(local_port), test_flag], stdout=PIPE, bufsize=1)
+
+		command_array = [iperf_path, "-c", environment['hostname'], "-u", "-i", "1", "-l", str(datagram_size), "-p", str(remote_port), "-L", str(local_port), "-y", "C", "-t", str(duration), "-f", "m", "-b", str(bandwidth) + "M", "-L", str(local_port), test_flag]
+
+		if tos != False:
+			command_array += ["-S", str(tos)]
+
+		iperf_process = Popen(command_array, stdout=PIPE, bufsize=1)
+
 		filteredcsv_process = Popen(["python", "-u", "../csv2filteredcsv/csv2filteredcsv.py", "-d"], stdin=iperf_process.stdout, stdout=PIPE, bufsize=1)
 		iperf_process.stdout.close()
 	else:
@@ -280,6 +300,10 @@ def getSessionsAfter(timestamp):
 			session[c.description[i][0]] = row[i]
 		sessions.append(session)
 	
-def createSession(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port):
+def createSession(session, direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, tos):
+	command_array = ["python", "-u", "startSession.py", "-d", direction, "-b", str(bandwidth), "-t", str(duration), "-i", interface, "-e", environment, "-s", str(session), "-o", "sql"]
 
-	start_session_process = Popen(["python", "-u", "startSession.py", "-d", direction, "-b", str(bandwidth), "-t", str(duration), "-i", interface, "-e", environment, "-s", str(session), "-o", "sql" ])
+	if tos != False:
+		command_array += ["-T", str(tos)]
+
+	start_session_process = Popen(command_array)

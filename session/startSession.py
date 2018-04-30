@@ -47,6 +47,8 @@ iperf results
 
 -s: session id to tag results with
 
+-T: IPv4 TOS
+
 ##Purpose:
 Start a test session
 
@@ -75,7 +77,7 @@ Killing iperf
 
 if __name__ == '__main__':
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hd:b:t:i:e:s:r:l:o:", ["help", "direction=", "bandwidth=", "time=", "interface=", "environment=", "session", "remote_port=", "local_port=", "output"])
+		opts, args = getopt.getopt(sys.argv[1:], "hd:b:t:i:e:s:r:l:o:T:", ["help", "direction=", "bandwidth=", "time=", "interface=", "environment=", "session", "remote_port=", "local_port=", "output", "TOS="])
 	except getopt.GetoptError as err:
 		# print help information and exit:
 		print str(err)  # will print something like "option -a not recognized"
@@ -91,6 +93,7 @@ if __name__ == '__main__':
 	remote_port = -1
 	local_port = -1
 	session = -1
+	tos = False
 
 	for o, a in opts:
 		if o in ("-h", "--help"):
@@ -107,6 +110,12 @@ if __name__ == '__main__':
 		elif o in ("-t", "--time"):
 			try:
 				duration = int(a)
+			except:
+				usage()
+				sys.exit()
+		elif o in ("-T", "--TOS"):
+			try:
+				tos = int(a)
 			except:
 				usage()
 				sys.exit()
@@ -170,7 +179,7 @@ if __name__ == '__main__':
 	
 	print "starting iPerf Remote"
 	
-	remote_pid = sessionManagement.runiPerfRemote(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, sql)
+	remote_pid = sessionManagement.runiPerfRemote(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, sql, tos)
 	
 	print "iPerf Remote started"
 		
@@ -182,7 +191,7 @@ if __name__ == '__main__':
 	timerThread.daemon = True
 	timerThread.start()
 	
-	sessionManagement.runiPerfLocal(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, sql, session)
+	sessionManagement.runiPerfLocal(direction, bandwidth, duration, interface, environment, datagram_size, remote_port, local_port, sql, session, tos)
 	
 	print "Test Complete"
 	
